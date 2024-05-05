@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:layout_margin="10dp"
     tools:context=".Foto">
 
-    <TextView
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_centerInParent="true"/>
+    <Button
+        android:id="@+id/btn_foto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Foto"
+        android:text="Tirar Foto"
+        android:layout_above="@id/imageView"
+        android:layout_centerHorizontal="true"/>
 
-        android:textSize="30sp"
-        android:textColor="@color/black"/>
 
-</FrameLayout>
+</RelativeLayout>
