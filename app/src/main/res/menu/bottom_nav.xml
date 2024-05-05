@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:title="Home"
+        android:id="@+id/home"
+        android:icon="@drawable/baseline_home_24"/>
+
+    <item
+        android:title="Foto"
+        android:id="@+id/foto"
+        android:icon="@drawable/baseline_image_search_24"/>
+
+    <item
+        android:title="Treinar Kanji"
+        android:id="@+id/treinar"
+        android:icon="@drawable/baseline_draw_24"/>
+    <item
+        android:title="Pesquisar"
+        android:id="@+id/pesquisar"
+        android:icon="@drawable/baseline_search_24"/>
+</menu>
