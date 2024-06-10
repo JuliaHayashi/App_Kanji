@@ -9,39 +9,43 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
+import androidx.activity.result.contract.ActivityResultContracts
+import com.example.app_kanji.databinding.FragmentFotoBinding
 
 class Foto : Fragment() {
 
-    private lateinit var imageView: ImageView
-    private val REQUEST_IMAGE_CAPTURE = 1
+    private lateinit var binding: FragmentFotoBinding
+
+    private val takePictureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val imageBitmap = result.data?.extras?.get("data") as? Bitmap
+            binding.imageView.setImageBitmap(imageBitmap)
+        }
+    }
+
+    private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let {
+            binding.imageView.setImageURI(uri)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.fragment_foto, container, false)
+        binding = FragmentFotoBinding.inflate(inflater, container, false)
 
-        imageView = rootView.findViewById(R.id.imageView)
-        val buttonTakePhoto: Button = rootView.findViewById(R.id.btn_foto)
-
-        buttonTakePhoto.setOnClickListener {
+        binding.btnTirarFoto.setOnClickListener {
             val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             if (takePictureIntent.resolveActivity(requireActivity().packageManager) != null) {
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+                takePictureLauncher.launch(takePictureIntent)
             }
         }
 
-        return rootView
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            val imageBitmap = data?.extras?.get("data") as? Bitmap
-            imageView.setImageBitmap(imageBitmap)
+        binding.btnFoto.setOnClickListener {
+            galleryLauncher.launch("image/*")
         }
+
+        return binding.root
     }
 }
