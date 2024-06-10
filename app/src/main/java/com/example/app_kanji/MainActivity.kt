@@ -1,5 +1,6 @@
 package com.example.app_kanji
 
+import Pesquisar
 import com.example.app_kanji.databinding.ActivityMainBinding
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
