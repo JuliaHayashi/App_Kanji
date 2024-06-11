@@ -1,6 +1,8 @@
 package com.example.app_kanji
 
 import Pesquisar
+import android.content.Intent
+import android.net.Uri
 import com.example.app_kanji.databinding.ActivityMainBinding
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -13,12 +15,10 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
 
-
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding : ActivityMainBinding
     private lateinit var drawerLayout: DrawerLayout
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -34,7 +34,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.pesquisar -> replaceFragment(Pesquisar())
                 else -> { }
             }
-
             true
         }
 
@@ -65,7 +64,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.configuracoes -> replaceFragment(Configuracoes())
-            R.id.email -> replaceFragment(Email())
+            R.id.email -> enviarEmail()
             R.id.info -> replaceFragment(Info())
             R.id.login -> Toast.makeText(this, "Login!!!", Toast.LENGTH_SHORT).show()
         }
@@ -82,12 +81,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    private fun enviarEmail() {
+        val emailIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_EMAIL, arrayOf("kanji.app@gmail.com"))
+            putExtra(Intent.EXTRA_SUBJECT, "")
+            putExtra(Intent.EXTRA_TEXT, "")
+            setPackage("com.google.android.gm")
+        }
+        startActivity(emailIntent)
+    }
+
+
     private fun replaceFragment(fragment : Fragment){
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.fragment_container, fragment)
         fragmentTransaction.commit()
-
 
         //        supportFragmentManager.beginTransaction()
 //            .replace(R.id.fragment_container, Configuracoes()).commit()

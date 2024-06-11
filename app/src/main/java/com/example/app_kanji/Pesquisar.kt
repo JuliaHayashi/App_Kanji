@@ -29,7 +29,7 @@ class Pesquisar : Fragment(), KanjiClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recyclerView = view.findViewById(R.id.recyclerView) // Acessando o RecyclerView diretamente
+        recyclerView = view.findViewById(R.id.recyclerView)
 
         populateKanjis()
 
