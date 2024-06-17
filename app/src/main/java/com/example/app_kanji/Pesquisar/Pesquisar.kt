@@ -48,84 +48,397 @@ class Pesquisar : Fragment(), KanjiClickListener {
 
         val kanji1 = Kanji(
             R.drawable.hi,
-            "The definitive text on the healing powers of the mind/body connection. In Ageless Body, Timeless Mind, world-renowned pioneer of integrative medicine Deepak Chopra goes beyond ancient mind/body wisdom and current anti-ageing research to show that you do not have to grow old. With the passage of time, you can retain your physical vitality, creativity, memory and self-esteem. Based on the theories of Ayurveda and groundbreaking research, Chopra reveals how we can use our innate capacity for balance to direct the way our bodies metabolize time and achieve our unbounded potential."
+            "Significado\n" +
+                    "Dia, Sol, Contador de anos\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Kunyomi\n" +
+                    "ひ, -び, -か\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Onyomi\n" +
+                    "ニチ, ジツ\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Quantidade de Traços\n" +
+                    "4\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Frequência\n" +
+                    "1\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "\"明日あなたは何をするのですか。\"\n" +
+                    "O que você vai fazer amanhã?\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "日本の中であなたはどこに行きたいですか？\n" +
+                    "Onde você quer ir no Japão?\n" +
+                    "______________________________________\n"
+
         )
+
         kanjiList.add(kanji1)
 
         val kanji2 = Kanji(
             R.drawable.ichi,
-            "This is the definitive book on mindfulness from the beloved Zen master and Nobel Peace Prize nominee Thich Nhat Hanh. With his signature clarity and warmth, he shares practical exercises and anecdotes to help us arrive at greater self-understanding and peacefulness, whether we are beginners or advanced students.\n" + "\n" + "Beautifully written, The Miracle of Mindfulness is the essential guide to welcoming presence in your life and truly living in the moment from the father of mindfulness.\n"
+            "Significado\n" +
+                    "Um, 1\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Kunyomi\n" +
+                    "ひと(つ)\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Onyomi\n" +
+                    "イチ\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Quantidade de Traços\n" +
+                    "1\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Frequência\n" +
+                    "2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "\"一人で学校へ行きます。\"\n" +
+                    "\n" +
+                    "Eu vou para a escola sozinho.\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "一週間ずっと日本語を勉強しました。\n" +
+                    "Estudei japonês a semana toda.\n" +
+                    "______________________________________\n"
         )
+
         kanjiList.add(kanji2)
 
         val kanji3 = Kanji(
             R.drawable.ni,
-            "A timeless classic in personal development, The Road Less Travelled is a landmark work that has inspired millions. Drawing on the experiences of his career as a psychiatrist, Scott Peck combines scientific and spiritual views to guide us through the difficult, painful times in life by showing us how to confront our problems through the key principles of discipline, love and grace.Teaching us how to distinguish dependency from love, how to become a more sensitive parent and how to connect with your true self, this incredible book is the key to accepting and overcoming life's challenges and achieving a higher level of self-understanding."
-        )
+            "Significado\n" +
+                    "Dois, 2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Kunyomi\n" +
+                    "ふた(つ)\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Onyomi\n" +
+                    "ニ、 ジ\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Quantidade de Traços\n" +
+                    "2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Frequência\n" +
+                    "8\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "\"水を二つください！\"\n" +
+                    "\n" +
+                    "Duas águas, por favor!\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "二月はとても寒いです。\n" +
+                    "Fevereiro é muito frio.\n" +
+                    "______________________________________\n"
+            )
         kanjiList.add(kanji3)
 
         val kanji4 = Kanji(
             R.drawable.hito,
-            "'A brave and heartbreaking novel that digs its claws into you and doesn't let go, long after you've finished it' Anna Todd, author of the After series\n" + "\n" + "'A glorious and touching read, a forever keeper' USA Today\n" + "\n" + "'Will break your heart while filling you with hope' Sarah Pekkanen, Perfect Neighbors\n"
+            "Significado\n" +
+                    "Pessoa\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Kunyomi\n" +
+                    "ひと\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Onyomi\n" +
+                    "ジン、 ニン\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Quantidade de Traços\n" +
+                    "2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Frequência\n" +
+                    "4\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "\"一人で学校へ行きます。\"\n" +
+                    "\n" +
+                    "Eu vou para a escola sozinho.\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "私はアメリカ人です。\n" +
+                    "Eu sou americano.\n" +
+                    "______________________________________\n"
         )
         kanjiList.add(kanji4)
 
         val kanji5 = Kanji(
             R.drawable.dai,
-            "Investigative journalist Ross Coulthart has been intrigued by UFOs since mysterious glowing lights were reported near New Zealand's Kaikoura mountains when he was a teenager. The 1978 sighting is just one of thousands since the 1940s, and yet research into UFOs is still seen as the realm of crackpots and conspiracy theorists."
+            "Significado\n" +
+                    "Dois, 2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Kunyomi\n" +
+                    "おお(きい)\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Onyomi\n" +
+                    "ダイ、 タイ\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Quantidade de Traços\n" +
+                    "2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Frequência\n" +
+                    "6\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "\"あなたのことが大好きだ。\"\n" +
+                    "\n" +
+                    "Eu te amo muito.\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "もう少し大きな声で話してください。\n" +
+                    "Por favor, fale um pouco mais alto.\n" +
+                    "______________________________________\n"
         )
         kanjiList.add(kanji5)
 
         val kanji6 = Kanji(
             R.drawable.koku,
-            " is still seen as the realm of crackpots and conspiracy theorists."
+            "Significado\n" +
+                    "Cidade\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Kunyomi\n" +
+                    "くに\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Onyomi\n" +
+                    "コク\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Quantidade de Traços\n" +
+                    "7\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Frequência\n" +
+                    "3\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "\"あなたはどこの国から来ましたか？！\"\n" +
+                    "\n" +
+                    "De que país você é?\n" +
+                    "______________________________________\n"
         )
         kanjiList.add(kanji6)
 
         val kanji7 = Kanji(
             R.drawable.nen,
-            " is still seen as the realm of crackpots and conspiracy theorists."
+            "Significado\n" +
+                    "Dois, 2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Kunyomi\n" +
+                    "ふた(つ)\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Onyomi\n" +
+                    "ニ、 ジ\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Quantidade de Traços\n" +
+                    "2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Frequência\n" +
+                    "8\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "\"水を二つください！\"\n" +
+                    "\n" +
+                    "Duas águas, por favor!\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "二月はとても寒いです。\n" +
+                    "Fevereiro é muito frio.\n" +
+                    "______________________________________\n"
         )
         kanjiList.add(kanji7)
 
         val kanji8 = Kanji(
             R.drawable.juu,
-            " is still seen as the realm of crackpots and conspiracy theorists."
+            "Significado\n" +
+                    "Dois, 2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Kunyomi\n" +
+                    "ふた(つ)\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Onyomi\n" +
+                    "ニ、 ジ\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Quantidade de Traços\n" +
+                    "2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Frequência\n" +
+                    "8\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "\"水を二つください！\"\n" +
+                    "\n" +
+                    "Duas águas, por favor!\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "二月はとても寒いです。\n" +
+                    "Fevereiro é muito frio.\n" +
+                    "______________________________________\n"
         )
         kanjiList.add(kanji8)
 
         val kanji9 = Kanji(
             R.drawable.hon,
-            " is still seen as the realm of crackpots and conspiracy theorists."
+            "Significado\n" +
+                    "Dois, 2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Kunyomi\n" +
+                    "ふた(つ)\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Onyomi\n" +
+                    "ニ、 ジ\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Quantidade de Traços\n" +
+                    "2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Frequência\n" +
+                    "8\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "\"水を二つください！\"\n" +
+                    "\n" +
+                    "Duas águas, por favor!\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "二月はとても寒いです。\n" +
+                    "Fevereiro é muito frio.\n" +
+                    "______________________________________\n"
         )
         kanjiList.add(kanji9)
 
         val kanji10 = Kanji(
             R.drawable.naka,
-            " is still seen as the realm of crackpots and conspiracy theorists."
+            "Significado\n" +
+                    "Dois, 2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Kunyomi\n" +
+                    "ふた(つ)\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Onyomi\n" +
+                    "ニ、 ジ\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Quantidade de Traços\n" +
+                    "2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Frequência\n" +
+                    "8\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "\"水を二つください！\"\n" +
+                    "\n" +
+                    "Duas águas, por favor!\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "二月はとても寒いです。\n" +
+                    "Fevereiro é muito frio.\n" +
+                    "______________________________________\n"
         )
         kanjiList.add(kanji10)
 
         val kanji11 = Kanji(
             R.drawable.nagai,
-            " is still seen as the realm of crackpots and conspiracy theorists."
+            "Significado\n" +
+                    "Dois, 2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Kunyomi\n" +
+                    "ふた(つ)\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Onyomi\n" +
+                    "ニ、 ジ\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Quantidade de Traços\n" +
+                    "2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Frequência\n" +
+                    "8\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "\"水を二つください！\"\n" +
+                    "\n" +
+                    "Duas águas, por favor!\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "二月はとても寒いです。\n" +
+                    "Fevereiro é muito frio.\n" +
+                    "______________________________________\n"
         )
         kanjiList.add(kanji11)
 
         val kanji12 = Kanji(
             R.drawable.dasu,
-            " is still seen as the realm of crackpots and conspiracy theorists."
+            "Significado\n" +
+                    "Dois, 2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Kunyomi\n" +
+                    "ふた(つ)\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Onyomi\n" +
+                    "ニ、 ジ\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Quantidade de Traços\n" +
+                    "2\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "Frequência\n" +
+                    "8\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "\"水を二つください！\"\n" +
+                    "\n" +
+                    "Duas águas, por favor!\n" +
+                    "______________________________________\n" +
+                    "\n" +
+                    "二月はとても寒いです。\n" +
+                    "Fevereiro é muito frio.\n" +
+                    "______________________________________\n"
         )
         kanjiList.add(kanji12)
-
-
-
-
-
-
-
-
-
     }
 
     companion object {}

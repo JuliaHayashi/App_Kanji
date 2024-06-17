@@ -8,6 +8,7 @@
     android:orientation="vertical"
     tools:context=".Pesquisar.InfoActivity">
 
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -23,6 +24,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+
+
     <ImageView
         android:id="@+id/cover"
         android:layout_marginTop="10dp"
@@ -32,6 +35,11 @@
         android:src="@drawable/hi"
         android:adjustViewBounds="true"/>
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
     <TextView
         android:id="@+id/description"
         android:layout_marginTop="10dp"
@@ -40,8 +48,6 @@
         android:gravity="center"
         android:textColor="@color/black"
         android:textSize="16sp" />
-
-
-
+    </ScrollView>
 
 </LinearLayout>
