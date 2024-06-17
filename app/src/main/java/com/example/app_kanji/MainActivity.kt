@@ -14,6 +14,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.app_kanji.Treinar.Treinar
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -66,10 +67,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.configuracoes -> replaceFragment(Configuracoes())
             R.id.email -> enviarEmail()
             R.id.info -> replaceFragment(Info())
-            R.id.login -> Toast.makeText(this, "Login!!!", Toast.LENGTH_SHORT).show()
+            R.id.login -> logout()
         }
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    private fun logout(){
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
     }
 
     override fun onBackPressed() {
@@ -91,7 +97,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         startActivity(emailIntent)
     }
-
 
     private fun replaceFragment(fragment : Fragment){
         val fragmentManager = supportFragmentManager
