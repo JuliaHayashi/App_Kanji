@@ -1,18 +1,63 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".Info">
+    android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        android:text="Sobre nós"
-        android:textSize="30sp"
-        android:textColor="@color/black"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-</FrameLayout>
+            <TextView
+                android:id="@+id/paragrafo1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:justificationMode="inter_word"
+                android:text="    Este projeto visa contribuir para a área educacional, explorando novas alternativas à educação fora da escola, por meio das tecnologias móveis que possam ser utilizadas para aprimorar o ensino do idioma japonês e seu complexo sistema de escrita. O aplicativo desenvolvido representa uma ferramenta promissora para estudantes de japonês, oferecendo uma abordagem prática, envolvente e muito interativa para o aprendizado dos kanjis."
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:id="@+id/paragrafo2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:justificationMode="inter_word"
+                android:text="    Ele fornecerá exercícios interativos nos quais os usuários podem praticar a identificação de kanji por meio da escrita manual utilizando a tela do celular como superfície de escrita. Durante o processo de escrita, o aplicativo oferece feedback em tempo real, destacando seus erros em relação ao traçado correto do kanji. Os usuários têm a oportunidade de corrigir seus erros e repetir a prática quantas vezes forem necessárias até se sentirem familiarizados com o caractere."
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_below="@id/paragrafo1"/>
+
+            <TextView
+                android:id="@+id/paragrafo3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:justificationMode="inter_word"
+                android:text="    Em suma, objetiva-se com este projeto o desenvolvimento de um programa para dispositivos móveis, tendo como público alvo estudantes brasileiros da língua japonesa, visando facilitar o aprendizado dos kanjis. Isso será possível através da apresentação de seus significados e sua ordem de escrita - aspecto que possui bastante importância na língua japonesa - além de fornecer suas pronúncias e exemplos de uso em algumas frases. "
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_below="@id/paragrafo2"/>
+
+        </RelativeLayout>
+    </ScrollView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

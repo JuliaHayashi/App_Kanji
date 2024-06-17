@@ -53,34 +53,79 @@ class Pesquisar : Fragment(), KanjiClickListener {
         kanjiList.add(kanji1)
 
         val kanji2 = Kanji(
-            R.drawable.hi1,
+            R.drawable.ichi,
             "This is the definitive book on mindfulness from the beloved Zen master and Nobel Peace Prize nominee Thich Nhat Hanh. With his signature clarity and warmth, he shares practical exercises and anecdotes to help us arrive at greater self-understanding and peacefulness, whether we are beginners or advanced students.\n" + "\n" + "Beautifully written, The Miracle of Mindfulness is the essential guide to welcoming presence in your life and truly living in the moment from the father of mindfulness.\n"
         )
         kanjiList.add(kanji2)
 
         val kanji3 = Kanji(
-            R.drawable.ichi1,
+            R.drawable.ni,
             "A timeless classic in personal development, The Road Less Travelled is a landmark work that has inspired millions. Drawing on the experiences of his career as a psychiatrist, Scott Peck combines scientific and spiritual views to guide us through the difficult, painful times in life by showing us how to confront our problems through the key principles of discipline, love and grace.Teaching us how to distinguish dependency from love, how to become a more sensitive parent and how to connect with your true self, this incredible book is the key to accepting and overcoming life's challenges and achieving a higher level of self-understanding."
         )
         kanjiList.add(kanji3)
 
         val kanji4 = Kanji(
-            R.drawable.hi3,
+            R.drawable.hito,
             "'A brave and heartbreaking novel that digs its claws into you and doesn't let go, long after you've finished it' Anna Todd, author of the After series\n" + "\n" + "'A glorious and touching read, a forever keeper' USA Today\n" + "\n" + "'Will break your heart while filling you with hope' Sarah Pekkanen, Perfect Neighbors\n"
         )
         kanjiList.add(kanji4)
 
         val kanji5 = Kanji(
-            R.drawable.ichi4,
+            R.drawable.dai,
             "Investigative journalist Ross Coulthart has been intrigued by UFOs since mysterious glowing lights were reported near New Zealand's Kaikoura mountains when he was a teenager. The 1978 sighting is just one of thousands since the 1940s, and yet research into UFOs is still seen as the realm of crackpots and conspiracy theorists."
         )
         kanjiList.add(kanji5)
 
-        kanjiList.add(kanji1)
-        kanjiList.add(kanji2)
-        kanjiList.add(kanji3)
-        kanjiList.add(kanji4)
-        kanjiList.add(kanji5)
+        val kanji6 = Kanji(
+            R.drawable.koku,
+            " is still seen as the realm of crackpots and conspiracy theorists."
+        )
+        kanjiList.add(kanji6)
+
+        val kanji7 = Kanji(
+            R.drawable.nen,
+            " is still seen as the realm of crackpots and conspiracy theorists."
+        )
+        kanjiList.add(kanji7)
+
+        val kanji8 = Kanji(
+            R.drawable.juu,
+            " is still seen as the realm of crackpots and conspiracy theorists."
+        )
+        kanjiList.add(kanji8)
+
+        val kanji9 = Kanji(
+            R.drawable.hon,
+            " is still seen as the realm of crackpots and conspiracy theorists."
+        )
+        kanjiList.add(kanji9)
+
+        val kanji10 = Kanji(
+            R.drawable.naka,
+            " is still seen as the realm of crackpots and conspiracy theorists."
+        )
+        kanjiList.add(kanji10)
+
+        val kanji11 = Kanji(
+            R.drawable.nagai,
+            " is still seen as the realm of crackpots and conspiracy theorists."
+        )
+        kanjiList.add(kanji11)
+
+        val kanji12 = Kanji(
+            R.drawable.dasu,
+            " is still seen as the realm of crackpots and conspiracy theorists."
+        )
+        kanjiList.add(kanji12)
+
+
+
+
+
+
+
+
+
     }
 
     companion object {}
