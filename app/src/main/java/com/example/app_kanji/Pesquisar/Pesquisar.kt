@@ -1,3 +1,5 @@
+package com.example.app_kanji.Pesquisar
+
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,13 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.app_kanji.GridView.CardAdapter
-import com.example.app_kanji.GridView.InfoActivity
-import com.example.app_kanji.GridView.KANJI_ID_EXTRA
-import com.example.app_kanji.GridView.Kanji
-import com.example.app_kanji.GridView.KanjiClickListener
 import com.example.app_kanji.R
-import com.example.app_kanji.GridView.kanjiList
 
 class Pesquisar : Fragment(), KanjiClickListener {
 
@@ -22,7 +18,7 @@ class Pesquisar : Fragment(), KanjiClickListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
+
         return inflater.inflate(R.layout.fragment_pesquisar, container, false)
     }
 
@@ -87,7 +83,5 @@ class Pesquisar : Fragment(), KanjiClickListener {
         kanjiList.add(kanji5)
     }
 
-    companion object {
-        // Companion object implementation (if needed)
-    }
+    companion object {}
 }

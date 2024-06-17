@@ -1,10 +1,7 @@
-package com.example.app_kanji.GridView
+package com.example.app_kanji.Pesquisar
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.app_kanji.GridView.KANJI_ID_EXTRA
-import com.example.app_kanji.GridView.Kanji
-import com.example.app_kanji.GridView.kanjiList
 import com.example.app_kanji.databinding.ActivityInfoBinding
 
 class InfoActivity : AppCompatActivity() {

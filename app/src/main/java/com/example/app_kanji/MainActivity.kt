@@ -1,8 +1,7 @@
 package com.example.app_kanji
 
-import Pesquisar
+import com.example.app_kanji.Pesquisar.Pesquisar
 import android.content.Intent
-import android.net.Uri
 import com.example.app_kanji.databinding.ActivityMainBinding
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -13,6 +12,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import com.example.app_kanji.Treinar.Treinar
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {

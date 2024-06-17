@@ -1,4 +1,4 @@
-package com.example.app_kanji.GridView
+package com.example.app_kanji.Pesquisar
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

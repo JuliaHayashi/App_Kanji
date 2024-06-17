@@ -1,4 +1,4 @@
-package com.example.app_kanji.GridView
+package com.example.app_kanji.Pesquisar
 
 var kanjiList = mutableListOf<Kanji>()
 

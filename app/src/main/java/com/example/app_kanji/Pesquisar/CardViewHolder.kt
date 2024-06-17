@@ -1,4 +1,4 @@
-package com.example.app_kanji.GridView
+package com.example.app_kanji.Pesquisar
 
 import androidx.recyclerview.widget.RecyclerView
 import com.example.app_kanji.databinding.KanjiCardBinding
