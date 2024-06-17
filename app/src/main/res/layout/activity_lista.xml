@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".Treinar.ListaActivity">
 
-  <!-- Toolbar -->
   <androidx.appcompat.widget.Toolbar
       android:id="@+id/toolbar"
       android:layout_width="match_parent"
@@ -16,7 +15,7 @@
       android:elevation="4dp"
       android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
       app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-      app:title="Toolbar Title"
+      app:title="Lista de Kanji"
       app:titleTextColor="@android:color/white"
       android:fitsSystemWindows="true"
       app:layout_constraintTop_toTopOf="parent"

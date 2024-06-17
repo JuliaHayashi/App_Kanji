@@ -8,6 +8,21 @@
     android:orientation="vertical"
     tools:context=".Pesquisar.InfoActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/lavender"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:title="Kanji"
+        app:titleTextColor="@android:color/white"
+        android:fitsSystemWindows="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <ImageView
         android:id="@+id/cover"
         android:layout_marginTop="10dp"
@@ -25,6 +40,8 @@
         android:gravity="center"
         android:textColor="@color/black"
         android:textSize="16sp" />
+
+
 
 
 </LinearLayout>
