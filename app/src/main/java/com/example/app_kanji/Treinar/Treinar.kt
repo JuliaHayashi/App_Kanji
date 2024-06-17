@@ -1,5 +1,6 @@
 package com.example.app_kanji.Treinar
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,11 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.app_kanji.R
 
-class Treinar : Fragment() {
+class Treinar : Fragment(), AdapterClass.OnItemClickListener {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var dataList: ArrayList<DataClass>
-    lateinit var titleList: Array<String>
+    private lateinit var titleList: Array<String>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,7 +46,13 @@ class Treinar : Fragment() {
             dataList.add(dataClass)
         }
 
-        val adapter = AdapterClass(dataList)
+        val adapter = AdapterClass(dataList, this)
         recyclerView.adapter = adapter
+    }
+
+    override fun onItemClick(title: String) {
+        val intent = Intent(activity, ListaActivity::class.java)
+        intent.putExtra("titulo", title)
+        startActivity(intent)
     }
 }
