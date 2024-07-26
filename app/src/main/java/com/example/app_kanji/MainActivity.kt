@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.foto -> replaceFragment(Foto())
                 R.id.treinar -> replaceFragment(Treinar())
                 R.id.pesquisar -> replaceFragment(Pesquisar())
+
                 else -> { }
             }
             true
