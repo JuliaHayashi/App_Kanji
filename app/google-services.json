@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "967351265380",
+    "project_id": "app-kanji-5a2fd",
+    "storage_bucket": "app-kanji-5a2fd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:967351265380:android:cb4e9d8f935ff2d2a51771",
+        "android_client_info": {
+          "package_name": "com.example.app_kanji"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDbEypmBF58MzqR5V9NXOruqJNtaecoYA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
