@@ -5,7 +5,7 @@ var kanjiList = mutableListOf<Kanji>()
 val KANJI_ID_EXTRA = "kanjiExtra"
 
 class Kanji(
-    var cover: Int,
+    var imageUrl: String,
     var description: String,
     val id: Int? = kanjiList.size
 )

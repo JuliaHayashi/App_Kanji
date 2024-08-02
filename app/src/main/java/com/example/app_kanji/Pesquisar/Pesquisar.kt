@@ -30,13 +30,13 @@ class Pesquisar : Fragment(), KanjiClickListener {
         recyclerView = view.findViewById(R.id.recyclerView)
         databaseReference = FirebaseDatabase.getInstance().reference.child("Ideogramas")
 
-        populateKanjis()
-
         val mainFragment = this
         recyclerView.apply {
             layoutManager = GridLayoutManager(requireContext(), 3)
             adapter = CardAdapter(kanjiList, mainFragment)
         }
+
+        populateKanjis()
     }
 
     override fun onClick(kanji: Kanji) {
@@ -56,7 +56,7 @@ class Pesquisar : Fragment(), KanjiClickListener {
                     if (ideogram != null) {
                         Log.d("FirebaseData", "Ideograma: $ideogram")
                         val kanji = Kanji(
-                            R.drawable.hi, // Altere conforme a imagem correta
+                            ideogram.imagem ?: "", // URL da imagem do Firebase
                             "Significado\n" +
                                     "${ideogram.significado}\n" +
                                     "______________________________________\n" +
