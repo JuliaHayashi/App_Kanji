@@ -5,14 +5,14 @@ import android.os.Bundle
 import com.bumptech.glide.Glide
 import com.example.app_kanji.R
 import com.example.app_kanji.R.*
-import com.example.app_kanji.databinding.ActivityInfoBinding
+import com.example.app_kanji.databinding.ActivityKanjiInfoBinding
 
-class InfoActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityInfoBinding
+class Kanji_InfoActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityKanjiInfoBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityInfoBinding.inflate(layoutInflater)
+        binding = ActivityKanjiInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val kanjiID = intent.getIntExtra(KANJI_ID_EXTRA, -1)

@@ -40,7 +40,7 @@ class Pesquisar : Fragment(), KanjiClickListener {
     }
 
     override fun onClick(kanji: Kanji) {
-        val intent = Intent(requireContext(), InfoActivity::class.java)
+        val intent = Intent(requireContext(), Kanji_InfoActivity::class.java)
         intent.putExtra(KANJI_ID_EXTRA, kanji.id)
         startActivity(intent)
     }

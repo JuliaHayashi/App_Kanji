@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Pesquisar.InfoActivity">
+    tools:context=".Pesquisar.Kanji_InfoActivity">
 
 
     <androidx.appcompat.widget.Toolbar
@@ -40,14 +40,14 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-    <TextView
-        android:id="@+id/description"
-        android:layout_marginTop="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textColor="@color/black"
-        android:textSize="16sp" />
+        <TextView
+            android:id="@+id/description"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
     </ScrollView>
 
 </LinearLayout>
