@@ -29,4 +29,13 @@
         android:layout_centerHorizontal="true"
         android:text="Selecionar Imagem" />
 
+    <TextView
+        android:id="@+id/resultTextView"
+        android:layout_width="351dp"
+        android:layout_height="75dp"
+        android:layout_below="@id/imageView"
+        android:layout_marginTop="-28dp"
+        android:text="Resultado: "
+        android:textSize="18sp" />
+
 </RelativeLayout>
