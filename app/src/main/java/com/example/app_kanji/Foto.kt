@@ -2,20 +2,19 @@ package com.example.app_kanji
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.example.app_kanji.databinding.FragmentFotoBinding
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
@@ -138,44 +137,37 @@ class Foto : Fragment() {
 
             val inputShape = interpreter?.getInputTensor(0)?.shape() ?: return
             val inputBuffer = TensorBuffer.createFixedSize(inputShape, DataType.FLOAT32)
-
-            // Fill input buffer with image data
             inputBuffer.loadBuffer(imageBuffer)
 
             val outputShape = interpreter?.getOutputTensor(0)?.shape() ?: return
             val outputBuffer = TensorBuffer.createFixedSize(outputShape, DataType.FLOAT32)
 
-            // Run inference
             interpreter?.run(inputBuffer.buffer.rewind(), outputBuffer.buffer.rewind())
-
             val outputArray = outputBuffer.floatArray
 
-            // Print the shape of the output tensor for debugging
-            Log.d("Foto", "Output Shape: ${outputShape.joinToString(", ")}")
+            // Log the output array for debugging
+            Log.d("Foto", "Output Array: ${outputArray.joinToString(", ").take(100)}") // Log first 100 values
 
-            // Check if the length of outputArray matches the number of labels
-            if (outputArray.size == labels.size) {
-                val predictedIndex = outputArray.indices.maxByOrNull { outputArray[it] } ?: -1
-                Log.d("Foto", "Predicted Index: $predictedIndex")
+            // Handle output based on shape and content
+            if (outputArray.isNotEmpty()) {
+                val maxIndex = outputArray.indices.maxByOrNull { outputArray[it] } ?: -1
 
-                val resultText = if (predictedIndex in labels.indices) {
-                    labels[predictedIndex]
+                val resultText = if (maxIndex in labels.indices) {
+                    labels[maxIndex]
                 } else {
-                    "Unknown"
+                    "Nenhuma identificação"
                 }
 
                 binding.resultTextView.text = resultText
             } else {
-                Log.e("Foto", "Output array length does not match number of labels")
-                binding.resultTextView.text = "Error"
+                binding.resultTextView.text = "Erro: Nenhuma saída do modelo"
             }
 
         } catch (e: Exception) {
             Log.e("Foto", "Erro durante o processamento da imagem: ${e.message}")
-            binding.resultTextView.text = "Error"
+            binding.resultTextView.text = "Erro"
         }
     }
-
 
 
     override fun onDestroyView() {
