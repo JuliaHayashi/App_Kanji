@@ -34,14 +34,14 @@ class Foto : Fragment() {
     private lateinit var binding: FragmentFotoBinding
     private val REQUEST_CAMERA_PERMISSION = 1
     private var interpreter: Interpreter? = null
-    private var labels = mutableListOf<String>()
+    private val labels = mutableListOf<String>()
     private var inputSize: Int = 0
     private var numChannels: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentFotoBinding.inflate(inflater, container, false)
         checkPermissions()
         setupInterpreter()
@@ -71,10 +71,10 @@ class Foto : Fragment() {
                 binding.imageView.setImageBitmap(it)
                 processImage(it)
             } ?: run {
-                Log.e("Foto", "Falha ao recuperar imagem da câmera")
+                Log.e("Foto", "Failed to retrieve image from the camera")
             }
         } else {
-            Log.e("Foto", "Falha ao capturar imagem: ${result.resultCode}")
+            Log.e("Foto", "Failed to capture image: ${result.resultCode}")
         }
     }
 
@@ -85,10 +85,10 @@ class Foto : Fragment() {
                 binding.imageView.setImageBitmap(imageBitmap)
                 processImage(imageBitmap)
             } catch (e: Exception) {
-                Log.e("Foto", "Erro ao recuperar imagem da galeria: ${e.message}")
+                Log.e("Foto", "Error retrieving image from gallery: ${e.message}")
             }
         } ?: run {
-            Log.e("Foto", "Falha ao recuperar URI da imagem")
+            Log.e("Foto", "Failed to retrieve URI of the image")
         }
     }
 
@@ -99,10 +99,10 @@ class Foto : Fragment() {
             interpreter = Interpreter(model, options)
 
             val inputShape = interpreter?.getInputTensor(0)?.shape() ?: return
-            inputSize = inputShape[1] // Altura e largura da imagem
-            numChannels = inputShape[3] // Número de canais da imagem
+            inputSize = inputShape[1] // Height and width of the image
+            numChannels = inputShape[3] // Number of image channels
 
-            // Carrega os labels
+            // Load labels
             val inputStream: InputStream = requireContext().assets.open("labels.txt")
             val reader = BufferedReader(InputStreamReader(inputStream))
             var line: String? = reader.readLine()
@@ -112,61 +112,83 @@ class Foto : Fragment() {
             }
             reader.close()
 
-            Log.d("Foto", "Labels carregadas: $labels")
+            Log.d("Foto", "Labels loaded: $labels")
 
         } catch (e: IOException) {
-            Log.e("Foto", "Erro ao configurar o intérprete: ${e.message}")
+            Log.e("Foto", "Error setting up the interpreter: ${e.message}")
         }
     }
 
-    private fun processImage(image: Bitmap) {
+    private fun processImage(bitmap: Bitmap) {
+        // Store the interpreter in a local variable
+        val interpreterLocal = interpreter
+        if (interpreterLocal == null) {
+            Log.e("Foto", "Interpreter is not initialized.")
+            binding.resultTextView.text = "Error"
+            return
+        }
+
         try {
-            interpreter ?: return
+            // Convert bitmap to TensorImage
+            val tensorImage = TensorImage.fromBitmap(bitmap)
 
-            val imageProcessor = ImageProcessor.Builder()
-                .add(NormalizeOp(0f, 255f))
-                .add(CastOp(DataType.FLOAT32))
-                .build()
+            // Prepare input tensor
+            val inputTensor = tensorImage.buffer
 
-            val resizedBitmap = Bitmap.createScaledBitmap(image, inputSize, inputSize, true)
-            val tensorImage = TensorImage(DataType.FLOAT32)
-            tensorImage.load(resizedBitmap)
+            // Create output tensor
+            val outputShape = intArrayOf(1, 9, 8400) // Model's output shape
+            val outputBuffer = FloatArray(9 * 8400) // Adjust size based on output shape
+            val outputTensor = TensorBuffer.createFixedSize(outputShape, DataType.FLOAT32)
 
-            val processedImage = imageProcessor.process(tensorImage)
-            val imageBuffer = processedImage.buffer
+            // Run inference
+            interpreterLocal.run(inputTensor, outputTensor.buffer.rewind())
 
-            val inputShape = interpreter?.getInputTensor(0)?.shape() ?: return
-            val inputBuffer = TensorBuffer.createFixedSize(inputShape, DataType.FLOAT32)
-            inputBuffer.loadBuffer(imageBuffer)
+            // Get output array
+            val outputArray = outputTensor.floatArray
 
-            val outputShape = interpreter?.getOutputTensor(0)?.shape() ?: return
-            val outputBuffer = TensorBuffer.createFixedSize(outputShape, DataType.FLOAT32)
+            // Initialize an array to store aggregated scores for each class
+            val classScores = FloatArray(9) { Float.MIN_VALUE }
 
-            interpreter?.run(inputBuffer.buffer.rewind(), outputBuffer.buffer.rewind())
-            val outputArray = outputBuffer.floatArray
-
-            // Log the output array for debugging
-            Log.d("Foto", "Output Array: ${outputArray.joinToString(", ").take(100)}") // Log first 100 values
-
-            // Handle output based on shape and content
-            if (outputArray.isNotEmpty()) {
-                val maxIndex = outputArray.indices.maxByOrNull { outputArray[it] } ?: -1
-
-                val resultText = if (maxIndex in labels.indices) {
-                    labels[maxIndex]
-                } else {
-                    "Nenhuma identificação"
+            // Aggregate scores for each category
+            for (category in 0 until 9) {
+                var maxScore = Float.MIN_VALUE
+                for (i in 0 until 8400) {
+                    val score = outputArray[category * 8400 + i]
+                    if (score > maxScore) {
+                        maxScore = score
+                    }
                 }
-
-                binding.resultTextView.text = resultText
-            } else {
-                binding.resultTextView.text = "Erro: Nenhuma saída do modelo"
+                classScores[category] = maxScore
             }
 
+            // Find the index of the maximum score among the 9 categories
+            val predictedClassIndex = classScores.indexOfMax()
+
+            // Map the index to the corresponding label if within range
+            val resultLabel = if (predictedClassIndex < labels.size) {
+                labels[predictedClassIndex]
+            } else {
+                "Unknown"
+            }
+
+            // Display the result
+            binding.resultTextView.text = resultLabel
+
         } catch (e: Exception) {
-            Log.e("Foto", "Erro durante o processamento da imagem: ${e.message}")
-            binding.resultTextView.text = "Erro"
+            Log.e("Foto", "Error during image processing: ${e.message}")
+            binding.resultTextView.text = "Error"
         }
+    }
+    
+    // Utility function to find the index of the maximum value in an array
+    private fun FloatArray.indexOfMax(): Int {
+        var maxIndex = 0
+        for (i in this.indices) {
+            if (this[i] > this[maxIndex]) {
+                maxIndex = i
+            }
+        }
+        return maxIndex
     }
 
 
