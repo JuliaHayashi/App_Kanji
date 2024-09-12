@@ -20,11 +20,27 @@ class Kanji_InfoActivity : AppCompatActivity() {
         if (kanji != null) {
             Glide.with(this)
                 .load(kanji.imageUrl)
-                .placeholder(drawable.baseline_info_24) // Placeholder enquanto a imagem carrega
-                .error(drawable.baseline_info_24) // Imagem de erro
-                .into(binding.cover)
+                .placeholder(R.drawable.baseline_info_24)
+                .error(R.drawable.baseline_info_24)
+                .into(binding.kanjiImage)
 
-            binding.description.text = kanji.description
+            binding.significado.text = kanji.significado
+            binding.onyomi.text = kanji.onyomi
+            binding.kunyomi.text = kanji.kunyomi
+            binding.qtdTracos.text = "Traços: ${kanji.qtd_tracos}"
+            binding.frequencia.text = "Frequência: ${kanji.frequencia}"
+
+            binding.exemplo1.text = kanji.exemplo1
+            binding.ex1Significado.text = kanji.ex1_significado
+
+            binding.exemplo2.text = kanji.exemplo2
+            binding.ex2Significado.text =kanji.ex2_significado
+
+            binding.exemplo3.text = kanji.exemplo3
+            binding.ex3Significado.text = kanji.ex3_significado
+
+            binding.exemplo4.text = kanji.exemplo4
+            binding.ex4Significado.text = kanji.ex4_significado
         }
     }
 

@@ -191,7 +191,6 @@ class Foto : Fragment() {
         return maxIndex
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         interpreter?.close()

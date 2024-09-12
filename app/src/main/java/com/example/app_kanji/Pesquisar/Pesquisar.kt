@@ -56,43 +56,23 @@ class Pesquisar : Fragment(), KanjiClickListener {
                     if (ideogram != null) {
                         Log.d("FirebaseData", "Ideograma: $ideogram")
                         val kanji = Kanji(
-                            ideogram.imagem ?: "", // URL da imagem do Firebase
-                            "Significado\n" +
-                                    "${ideogram.significado}\n" +
-                                    "______________________________________\n" +
-                                    "\n" +
-                                    "Kunyomi\n" +
-                                    "${ideogram.kunyomi}\n" +
-                                    "______________________________________\n" +
-                                    "\n" +
-                                    "Onyomi\n" +
-                                    "${ideogram.onyomi}\n" +
-                                    "______________________________________\n" +
-                                    "\n" +
-                                    "Quantidade de Traços\n" +
-                                    "${ideogram.qtd_tracos}\n" +
-                                    "______________________________________\n" +
-                                    "\n" +
-                                    "Frequência\n" +
-                                    "${ideogram.frequencia}\n" +
-                                    "______________________________________\n" +
-                                    "\n" +
-                                    "${ideogram.exemplo1}\n" +
-                                    "${ideogram.ex1_significado}\n" +
-                                    "______________________________________\n" +
-                                    "\n" +
-                                    "${ideogram.exemplo2}\n" +
-                                    "${ideogram.ex2_significado}\n" +
-                                    "______________________________________\n" +
-                                    "\n" +
-                                    "${ideogram.exemplo3}\n" +
-                                    "${ideogram.ex3_significado}\n" +
-                                    "______________________________________\n" +
-                                    "\n" +
-                                    "${ideogram.exemplo4}\n" +
-                                    "${ideogram.ex4_significado}\n" +
-                                    "______________________________________\n"
+                            imageUrl = ideogram.imagem ?: "",
+                            significado = ideogram.significado,
+                            onyomi = ideogram.onyomi,
+                            kunyomi = ideogram.kunyomi,
+                            qtd_tracos = ideogram.qtd_tracos,
+                            frequencia = ideogram.frequencia,
+                            exemplo1 = ideogram.exemplo1,
+                            ex1_significado = ideogram.ex1_significado,
+                            exemplo2 = ideogram.exemplo2,
+                            ex2_significado = ideogram.ex2_significado,
+                            exemplo3 = ideogram.exemplo3,
+                            ex3_significado = ideogram.ex3_significado,
+                            exemplo4 = ideogram.exemplo4,
+                            ex4_significado = ideogram.ex4_significado
                         )
+
+
                         kanjiList.add(kanji)
                     } else {
                         Log.e("FirebaseData", "Erro ao ler o ideograma.")
