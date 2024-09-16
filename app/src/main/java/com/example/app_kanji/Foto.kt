@@ -106,29 +106,51 @@ class Foto : Fragment() {
 
     private fun processImage(image: Bitmap) {
         try {
-            val resizedBitmap = Bitmap.createScaledBitmap(image, 224, 224, true) // Assuming model input size is 224x224
+            val inputSize = 640  // Modelo espera 640x640 pixels
+            val resizedBitmap = Bitmap.createScaledBitmap(image, inputSize, inputSize, true)
+
+            // Criar TensorImage com tipo de dado FLOAT32
             val tensorImage = TensorImage(DataType.FLOAT32)
             tensorImage.load(resizedBitmap)
 
-            val inputBuffer = TensorBuffer.createFixedSize(intArrayOf(1, 224, 224, 3), DataType.FLOAT32)
+            // Criar um buffer de entrada com as dimensões esperadas [1, 640, 640, 3]
+            val inputBuffer = TensorBuffer.createFixedSize(intArrayOf(1, inputSize, inputSize, 3), DataType.FLOAT32)
             inputBuffer.loadBuffer(tensorImage.buffer)
 
-            val outputBuffer = TensorBuffer.createFixedSize(intArrayOf(1, labels.size), DataType.FLOAT32)
+            // Criar o buffer de saída com as dimensões esperadas [1, 9, 8400]
+            val outputBuffer = TensorBuffer.createFixedSize(intArrayOf(1, 9, 8400), DataType.FLOAT32)
 
+            // Executar a inferência
             interpreter?.run(inputBuffer.buffer, outputBuffer.buffer)
 
             val outputArray = outputBuffer.floatArray
-            val maxIndex = outputArray.indices.maxByOrNull { outputArray[it] } ?: -1
-            val identifiedLabel = if (maxIndex != -1) labels[maxIndex] else "Nenhuma identificação"
 
-            // Update the UI with the identified label
-            binding.resultTextView.text = "Resultado: $identifiedLabel"
+            // Exibir os primeiros valores para ver como eles estão distribuídos
+            Log.d("Output Analysis", "Primeiros valores do output: ${outputArray.take(10)}")
+
+            // Encontrar a maior pontuação no array de saída
+            val maxIndex = outputArray.indices.maxByOrNull { outputArray[it] } ?: -1
+            val maxScore = outputArray[maxIndex]
+
+            // Verificar se a pontuação é 1.0 e exibir uma mensagem apropriada
+            if (maxScore == 1.0f) {
+                binding.resultTextView.text = "Nenhum resultado confiável encontrado."
+            } else {
+                // Mapear o índice para um label (se aplicável)
+                val identifiedLabel = if (maxIndex != -1) labels[maxIndex % labels.size] else "Nenhuma identificação"
+
+                // Exibir o resultado
+                binding.resultTextView.text = "Resultado: $identifiedLabel (pontuação: $maxScore)"
+            }
 
         } catch (e: Exception) {
             Log.e("Foto", "Error processing image: ${e.message}")
-            binding.resultTextView.text = "Erro durante o processamento"
+            binding.resultTextView.text = "Erro durante o processamento: ${e.message}"
         }
     }
+
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()
