@@ -14,5 +14,6 @@ data class Ideogramas(
     var kunyomi: String? = null,
     var onyomi: String? = null,
     var qtd_tracos: Int = 0,
-    var significado: String? = null
+    var significado: String? = null,
+    val categorias: String? = null
 )
