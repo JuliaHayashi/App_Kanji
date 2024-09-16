@@ -6,48 +6,221 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:padding="16dp"
     tools:context=".Pesquisar.Kanji_InfoActivity">
 
-
+    <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:background="@color/lavender"
         android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:title="Kanji"
+        app:title="Kanji Details"
         app:titleTextColor="@android:color/white"
-        android:fitsSystemWindows="true"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-
-
+    <!-- Kanji Image -->
     <ImageView
-        android:id="@+id/cover"
-        android:layout_marginTop="10dp"
+        android:id="@+id/kanjiImage"
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_height="150dp"
         android:layout_gravity="center"
-        android:src="@drawable/hi"
-        android:adjustViewBounds="true"/>
+        android:layout_marginTop="16dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerInside"
+        android:src="@drawable/baseline_image_search_24"/> <!-- Substitua com o seu recurso de imagem -->
 
-    <ScrollView
+    <!-- Kanji Significado (Meaning) -->
+    <TextView
+        android:id="@+id/significado"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:text="Significado: sabedoria e conhecimento."/>
 
-        <TextView
-            android:id="@+id/description"
-            android:layout_marginTop="10dp"
+    <!-- Onyomi and Kunyomi Readings -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_marginTop="16dp">
+
+        <!-- Onyomi -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Onyomi"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/onyomi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="おんよみ (On'yomi)"/>
+        </LinearLayout>
+
+        <!-- Kunyomi -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kunyomi"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/kunyomi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="くんよみ (Kun'yomi)"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Additional Info (Stroke count, frequency, etc.) -->
+    <TextView
+        android:id="@+id/qtd_tracos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:text="Quantidade de Traços: 10"/>
+
+    <TextView
+        android:id="@+id/frequencia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:text="Frequência: Alta"/>
+
+    <!-- Linha Horizontal para Exemplo e Significado -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="8dp">
+
+        <!-- Exemplo 1 -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@color/black"
-            android:textSize="16sp" />
-    </ScrollView>
+            android:orientation="horizontal"
+            android:layout_marginBottom="4dp">
 
+            <TextView
+                android:id="@+id/exemplo1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:layout_marginEnd="8dp"
+                android:text="Exemplo 1: 学ぶ"/>
+
+            <TextView
+                android:id="@+id/ex1_significado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:text="Significado 1: Estudar"/>
+        </LinearLayout>
+
+        <!-- Exemplo 2 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="4dp">
+
+            <TextView
+                android:id="@+id/exemplo2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:layout_marginEnd="8dp"
+                android:text="Exemplo 2: 学校"/>
+
+            <TextView
+                android:id="@+id/ex2_significado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:text="Significado 2: Escola"/>
+        </LinearLayout>
+
+        <!-- Exemplo 3 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="4dp">
+
+            <TextView
+                android:id="@+id/exemplo3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:layout_marginEnd="8dp"
+                android:text="Exemplo 3: 学者"/>
+
+            <TextView
+                android:id="@+id/ex3_significado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:text="Significado 3: Estudioso"/>
+        </LinearLayout>
+
+        <!-- Exemplo 4 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="4dp">
+
+            <TextView
+                android:id="@+id/exemplo4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:layout_marginEnd="8dp"
+                android:text="Exemplo 3: 学者"/>
+
+            <TextView
+                android:id="@+id/ex4_significado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:text="Significado 4: Estudioso"/>
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>
