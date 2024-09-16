@@ -27,8 +27,8 @@ class Kanji_InfoActivity : AppCompatActivity() {
             binding.significado.text = kanji.significado
             binding.onyomi.text = kanji.onyomi
             binding.kunyomi.text = kanji.kunyomi
-            binding.qtdTracos.text = "Traços: ${kanji.qtd_tracos}"
-            binding.frequencia.text = "Frequência: ${kanji.frequencia}"
+            binding.qtdTracos.text = "${kanji.qtd_tracos}"
+            binding.frequencia.text = "${kanji.frequencia}"
 
             binding.exemplo1.text = kanji.exemplo1
             binding.ex1Significado.text = kanji.ex1_significado

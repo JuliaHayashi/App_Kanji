@@ -5,13 +5,11 @@
     android:layout_width="match_parent"
     android:background="@color/white"
     android:layout_height="match_parent"
-
     tools:context=".Pesquisar.Pesquisar">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_marginTop="10dp"
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
+        android:layout_height="564dp"
+        android:layout_marginTop="10dp" />
     </FrameLayout>
