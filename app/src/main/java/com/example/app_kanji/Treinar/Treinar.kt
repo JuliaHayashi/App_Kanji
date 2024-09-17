@@ -22,12 +22,13 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_treinar, container, false)
 
+        // Definindo as categorias de kanjis
         titleList = arrayOf(
-            "Numerais",
-            "Posicoes",
-            "Adjetivos",
-            "Verbos",
-            "Dias da semana"
+            "adjetivos",
+            "dias_semana",
+            "numerais",
+            "posicoes",
+            "verbos",
         )
 
         recyclerView = view.findViewById(R.id.recyclerView)
@@ -40,6 +41,7 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
         return view
     }
 
+    // Populando os dados de título na lista
     private fun getData() {
         for (title in titleList) {
             val dataClass = DataClass(title)
@@ -50,9 +52,11 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
         recyclerView.adapter = adapter
     }
 
+    // Método acionado quando um item da lista é clicado
     override fun onItemClick(title: String) {
+        // Passando o título/categoria para a ListaActivity
         val intent = Intent(activity, ListaActivity::class.java)
-        intent.putExtra("titulo", title)
+        intent.putExtra("categoria", title) // Modifiquei o parâmetro para "categoria"
         startActivity(intent)
     }
 }
