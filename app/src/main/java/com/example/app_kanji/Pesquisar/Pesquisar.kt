@@ -71,8 +71,6 @@ class Pesquisar : Fragment(), KanjiClickListener {
                             exemplo4 = ideogram.exemplo4,
                             ex4_significado = ideogram.ex4_significado
                         )
-
-
                         kanjiList.add(kanji)
                     } else {
                         Log.e("FirebaseData", "Erro ao ler o ideograma.")

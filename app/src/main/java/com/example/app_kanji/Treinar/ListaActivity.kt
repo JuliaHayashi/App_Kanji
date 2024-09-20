@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.app_kanji.Pesquisar.CardAdapter
 import com.example.app_kanji.Pesquisar.Ideogramas
+import com.example.app_kanji.Pesquisar.KANJI_ID_EXTRA
 import com.example.app_kanji.Pesquisar.Kanji
 import com.example.app_kanji.Pesquisar.KanjiClickListener
 import com.example.app_kanji.Pesquisar.Kanji_InfoActivity
@@ -51,6 +52,7 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
     override fun onClick(kanji: Kanji) {
         val intent = Intent(this, Kanji_InfoActivity::class.java)
         intent.putExtra(KANJI_ID_EXTRA, kanji.id)
+        Log.d("ListaActivity", "Passando ID do Kanji: ${kanji.id}")
         startActivity(intent)
     }
 
@@ -110,14 +112,12 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
                                 exemplo4 = ideogram.exemplo4 ?: "",
                                 ex4_significado = ideogram.ex4_significado ?: ""
                             )
-
                             kanjiList.add(kanji)
                         }
                     } else {
                         Log.d("Ideogram", "Ideograma ou Kanji ID nulo detectado.")
                     }
                 }
-
                 Log.d("KanjiList", "Número de Kanjis encontrados: ${kanjiList.size}")
                 recyclerView.adapter?.notifyDataSetChanged()
             }
@@ -128,8 +128,5 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
         })
     }
 
-
-    companion object {
-        const val KANJI_ID_EXTRA = "KANJI_ID_EXTRA"
-    }
+    companion object {}
 }

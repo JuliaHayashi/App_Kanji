@@ -1,7 +1,6 @@
 package com.example.app_kanji.Pesquisar
 
 data class Ideogramas(
-    val kanji: String? = null,
     var ex1_significado: String? = null,
     var ex2_significado: String? = null,
     var ex3_significado: String? = null,

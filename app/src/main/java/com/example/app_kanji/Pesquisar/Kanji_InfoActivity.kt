@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.bumptech.glide.Glide
 import com.example.app_kanji.R
-import com.example.app_kanji.R.*
 import com.example.app_kanji.databinding.ActivityKanjiInfoBinding
 
 class Kanji_InfoActivity : AppCompatActivity() {
