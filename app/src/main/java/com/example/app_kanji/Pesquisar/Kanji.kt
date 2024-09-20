@@ -19,5 +19,5 @@ class Kanji(
     var ex3_significado: String? = null,
     var exemplo4: String? = null,
     var ex4_significado: String? = null,
-    val id: Int? = kanjiList.size
+    val id: String = kanjiList.size.toString() // ID agora é uma String
 )

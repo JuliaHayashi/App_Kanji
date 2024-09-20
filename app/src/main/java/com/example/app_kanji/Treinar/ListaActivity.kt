@@ -11,7 +11,6 @@ import com.example.app_kanji.Pesquisar.Ideogramas
 import com.example.app_kanji.Pesquisar.KANJI_ID_EXTRA
 import com.example.app_kanji.Pesquisar.Kanji
 import com.example.app_kanji.Pesquisar.KanjiClickListener
-import com.example.app_kanji.Pesquisar.Kanji_InfoActivity
 import com.example.app_kanji.R
 import com.google.firebase.database.*
 
@@ -21,19 +20,17 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
     private lateinit var databaseReference: DatabaseReference
     private val kanjiList = mutableListOf<Kanji>()
     private var categoriaSelecionada: String? = null
-    private var kanjisDaCategoria: List<String> = emptyList() // Lista de Kanjis da categoria selecionada
+    private var kanjisDaCategoria: List<String> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lista)
 
-        // Obtém a categoria que foi passada através do Intent
         categoriaSelecionada = intent.getStringExtra("categoria")
 
-        // Verifica se a categoria foi passada corretamente, se não, encerra a Activity
         if (categoriaSelecionada.isNullOrEmpty()) {
             Log.e("ListaActivity", "Categoria inválida ou não passada no Intent.")
-            finish() // Encerra a Activity se a categoria for inválida
+            finish()
             return
         }
 
@@ -45,21 +42,19 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
             adapter = CardAdapter(kanjiList, this@ListaActivity)
         }
 
-        // Primeiro, busca os Kanjis da categoria selecionada
         obterKanjisDaCategoria()
     }
 
     override fun onClick(kanji: Kanji) {
-        val intent = Intent(this, Kanji_InfoActivity::class.java)
+        Log.d("ListaActivity", "Kanji selecionado: ${kanji.id}")
+        val intent = Intent(this, Categoria_InfoActivity::class.java)
         intent.putExtra(KANJI_ID_EXTRA, kanji.id)
-        Log.d("ListaActivity", "Passando ID do Kanji: ${kanji.id}")
         startActivity(intent)
     }
 
     private fun obterKanjisDaCategoria() {
         val categoriasRef = databaseReference.child("Categorias").child("Predefinidas")
-
-        categoriasRef.child(categoriaSelecionada!!).addListenerForSingleValueEvent(object : ValueEventListener {
+        categoriasRef.child(categoriaSelecionada!!).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val kanjisString = dataSnapshot.getValue(String::class.java)
                 if (kanjisString != null) {
@@ -79,13 +74,11 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
 
     private fun populateKanjis() {
         kanjiList.clear()
-
-        databaseReference.child("Ideogramas").addListenerForSingleValueEvent(object : ValueEventListener {
+        databaseReference.child("Ideogramas").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 kanjiList.clear()
-
                 for (ideogramSnapshot in dataSnapshot.children) {
-                    // Obtém o ID do nó que é o Kanji
+                    // Usando o nome do nó (Kanji) como ID
                     val kanjiId = ideogramSnapshot.key
 
                     // Obtém os dados do Ideograma
@@ -94,9 +87,9 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
                     if (ideogram != null && kanjiId != null) {
                         Log.d("Ideogram", "Kanji ID: $kanjiId, Kanjis da Categoria: $kanjisDaCategoria")
 
-                        // Verifica se o Kanji ID está na lista de Kanjis da Categoria
                         if (kanjisDaCategoria.contains(kanjiId)) {
                             val kanji = Kanji(
+                                id = kanjiId,  // O ID agora será o próprio ideograma
                                 imageUrl = ideogram.imagem ?: "",
                                 significado = ideogram.significado ?: "",
                                 onyomi = ideogram.onyomi ?: "",
@@ -113,6 +106,7 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
                                 ex4_significado = ideogram.ex4_significado ?: ""
                             )
                             kanjiList.add(kanji)
+                            Log.d("KanjiList", "Kanji adicionado: ID = ${kanji.id}")
                         }
                     } else {
                         Log.d("Ideogram", "Ideograma ou Kanji ID nulo detectado.")
@@ -127,6 +121,4 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
             }
         })
     }
-
-    companion object {}
 }

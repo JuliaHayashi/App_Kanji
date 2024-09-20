@@ -14,9 +14,13 @@ class Kanji_InfoActivity : AppCompatActivity() {
         binding = ActivityKanjiInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val kanjiID = intent.getIntExtra(KANJI_ID_EXTRA, -1)
+        // Obtém o ID como String (o próprio Kanji)
+        val kanjiID = intent.getStringExtra(KANJI_ID_EXTRA) ?: ""
+
+        // Verifica o Kanji a partir do ID
         val kanji = kanjiFromID(kanjiID)
         if (kanji != null) {
+            // Exibe os dados do Kanji usando Glide e os TextViews
             Glide.with(this)
                 .load(kanji.imageUrl)
                 .placeholder(R.drawable.baseline_info_24)
@@ -33,7 +37,7 @@ class Kanji_InfoActivity : AppCompatActivity() {
             binding.ex1Significado.text = kanji.ex1_significado
 
             binding.exemplo2.text = kanji.exemplo2
-            binding.ex2Significado.text =kanji.ex2_significado
+            binding.ex2Significado.text = kanji.ex2_significado
 
             binding.exemplo3.text = kanji.exemplo3
             binding.ex3Significado.text = kanji.ex3_significado
@@ -43,10 +47,13 @@ class Kanji_InfoActivity : AppCompatActivity() {
         }
     }
 
-    private fun kanjiFromID(kanjiID: Int): Kanji? {
+    // Método para buscar o Kanji usando ID String
+    private fun kanjiFromID(kanjiID: String): Kanji? {
+        // Percorre a lista para buscar o Kanji com o ID igual ao próprio nome do ideograma
         for (kanji in kanjiList) {
-            if (kanji.id == kanjiID)
+            if (kanji.id == kanjiID) {
                 return kanji
+            }
         }
         return null
     }
