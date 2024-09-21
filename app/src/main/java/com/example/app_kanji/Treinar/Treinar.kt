@@ -57,6 +57,9 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
     }
 
     private fun loadCategories() {
+        // Limpa a lista antes de carregar as novas categorias
+        dataList.clear()
+
         // Adiciona categorias pré-definidas
         for ((key, value) in titleMap) {
             dataList.add(DataClass(value))
@@ -65,6 +68,15 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
         // Escuta as categorias do usuário
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                // Limpa a lista antes de adicionar categorias do banco
+                dataList.clear()
+
+                // Adiciona as categorias pré-definidas
+                for ((key, value) in titleMap) {
+                    dataList.add(DataClass(value))
+                }
+
+                // Adiciona as categorias do usuário
                 for (dataSnapshot in snapshot.children) {
                     val categoryName = dataSnapshot.key
                     categoryName?.let {
@@ -104,18 +116,31 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
     }
 
     private fun addCategoryToDatabase(categoryName: String) {
-        val newCategoryRef = databaseReference.child(categoryName)
-
-        newCategoryRef.setValue("Kanjis a serem adicionados").addOnCompleteListener { task ->
+        // Verifica se a categoria já existe no banco de dados
+        databaseReference.child(categoryName).get().addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                Toast.makeText(requireContext(), "Categoria adicionada com sucesso!", Toast.LENGTH_SHORT).show()
-                dataList.add(DataClass(categoryName)) // Adiciona a nova categoria à lista local
-                adapter.notifyItemInserted(dataList.size - 1) // Notifica o adaptador para atualizar a UI
+                if (task.result.exists()) {
+                    // Se a categoria já existe, exibe uma mensagem de erro
+                    Toast.makeText(requireContext(), "Categoria já existe!", Toast.LENGTH_SHORT).show()
+                } else {
+                    // Se não existe, adiciona a nova categoria
+                    val newCategoryRef = databaseReference.child(categoryName)
+                    newCategoryRef.setValue("Kanjis a serem adicionados").addOnCompleteListener { addTask ->
+                        if (addTask.isSuccessful) {
+                            Toast.makeText(requireContext(), "Categoria adicionada com sucesso!", Toast.LENGTH_SHORT).show()
+                            dataList.add(DataClass(categoryName)) // Adiciona a nova categoria à lista local
+                            adapter.notifyItemInserted(dataList.size - 1) // Notifica o adaptador para atualizar a UI
+                        } else {
+                            Toast.makeText(requireContext(), "Erro ao adicionar categoria", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
             } else {
-                Toast.makeText(requireContext(), "Erro ao adicionar categoria", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Erro ao verificar categoria", Toast.LENGTH_SHORT).show()
             }
         }
     }
+
 
     override fun onItemClick(title: String) {
         val categoryId = titleMap.entries.find { it.value == title }?.key ?: title // Permite clicar nas categorias do usuário
