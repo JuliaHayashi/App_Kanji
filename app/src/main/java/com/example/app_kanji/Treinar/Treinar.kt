@@ -141,8 +141,6 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
         }
     }
 
-
-
     override fun onItemClick(title: String) {
         val categoryId = titleMap.entries.find { it.value == title }?.key ?: title // Permite clicar nas categorias do usuário
 
