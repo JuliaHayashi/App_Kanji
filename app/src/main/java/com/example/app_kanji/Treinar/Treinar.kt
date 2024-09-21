@@ -128,8 +128,8 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
                     newCategoryRef.setValue("Kanjis a serem adicionados").addOnCompleteListener { addTask ->
                         if (addTask.isSuccessful) {
                             Toast.makeText(requireContext(), "Categoria adicionada com sucesso!", Toast.LENGTH_SHORT).show()
-                            dataList.add(DataClass(categoryName)) // Adiciona a nova categoria à lista local
-                            adapter.notifyItemInserted(dataList.size - 1) // Notifica o adaptador para atualizar a UI
+                            // Recarrega as categorias após a inserção
+                            loadCategories()
                         } else {
                             Toast.makeText(requireContext(), "Erro ao adicionar categoria", Toast.LENGTH_SHORT).show()
                         }
@@ -140,6 +140,7 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
             }
         }
     }
+
 
 
     override fun onItemClick(title: String) {
