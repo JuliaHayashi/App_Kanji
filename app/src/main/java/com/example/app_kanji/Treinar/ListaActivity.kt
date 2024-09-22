@@ -20,7 +20,7 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
     private lateinit var databaseReference: DatabaseReference
     private val kanjiList = mutableListOf<Kanji>()
     private var categoriaSelecionada: String? = null
-    private var kanjisDaCategoria: List<String> = emptyList()
+    private var kanjisDaCategoria: MutableList<String> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,17 +53,22 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
     }
 
     private fun obterKanjisDaCategoria() {
-        val categoriasRef = databaseReference.child("Categorias").child("Predefinidas")
-        categoriasRef.child(categoriaSelecionada!!).addValueEventListener(object : ValueEventListener {
+        // Acessando categorias predefinidas
+        val predefinidasRef = databaseReference.child("Categorias").child("Predefinidas").child(categoriaSelecionada!!)
+        Log.d("FirebasePath", "Acessando caminho: Categorias/Predefinidas/$categoriaSelecionada")
+
+        predefinidasRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val kanjisString = dataSnapshot.getValue(String::class.java)
-                if (kanjisString != null) {
-                    kanjisDaCategoria = kanjisString.split(", ").map { it.trim() }
-                    Log.d("Categoria", "Kanjis da categoria $categoriaSelecionada: $kanjisDaCategoria")
-                    populateKanjis()
+                Log.d("Categoria", "Dados retornados: $kanjisString")
+
+                if (!kanjisString.isNullOrEmpty()) {
+                    kanjisDaCategoria.addAll(kanjisString.split(",").map { it.trim() })
+                    Log.d("Categoria", "Kanjis da categoria predefinida $categoriaSelecionada: $kanjisDaCategoria")
                 } else {
-                    Log.d("Categoria", "Nenhum dado encontrado para a categoria $categoriaSelecionada")
+                    Log.d("Categoria", "Nenhum dado encontrado para a categoria predefinida $categoriaSelecionada")
                 }
+                obterKanjisUsuarios()  // Chama a função para buscar as categorias dos usuários
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -72,44 +77,77 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
         })
     }
 
+    private fun obterKanjisUsuarios() {
+        // Acessando categorias dos usuários
+        val usuariosRef = databaseReference.child("Categorias").child("DosUsuarios")
+        usuariosRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (usuarioSnapshot in dataSnapshot.children) {
+                    // Aqui estamos assumindo que você vai pegar todos os kanjis do usuário
+                    usuarioSnapshot.child("1").getValue(String::class.java)?.let { kanjisString ->
+                        kanjisDaCategoria.addAll(kanjisString.split(",").map { it.trim() })
+                        Log.d("Categoria", "Kanjis da categoria do usuário $categoriaSelecionada: $kanjisDaCategoria")
+                    }
+                }
+                // After fetching all kanji, populate the list
+                populateKanjis()
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("FirebaseData", "Database error: ${databaseError.message}")
+            }
+        })
+    }
+    private fun obterKanjisDeCategoriasDosUsuarios() {
+        val usuariosRef = databaseReference.child("Categorias").child("DosUsuarios")
+
+        // Busca os dados de todos os usuários
+        usuariosRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                dataSnapshot.children.forEach { usuarioSnapshot ->
+                    usuarioSnapshot.child(categoriaSelecionada ?: return).getValue(String::class.java)?.split(",")?.map(String::trim)?.let {
+                        kanjisDaCategoria.addAll(it)
+                        Log.d("Categoria", "Kanjis da categoria do usuário ${usuarioSnapshot.key}: $it")
+                    }
+                }
+                populateKanjis() // Chama a função para atualizar a UI após processar todos os dados
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("FirebaseData", "Erro de banco de dados: ${databaseError.message}")
+            }
+        })
+    }
+
+
     private fun populateKanjis() {
         kanjiList.clear()
-        databaseReference.child("Ideogramas").addValueEventListener(object : ValueEventListener {
+        databaseReference.child("Ideogramas").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                kanjiList.clear()
                 for (ideogramSnapshot in dataSnapshot.children) {
-                    // Usando o nome do nó (Kanji) como ID
-                    val kanjiId = ideogramSnapshot.key
+                    val kanjiId = ideogramSnapshot.key ?: continue
+                    val ideogram = ideogramSnapshot.getValue(Ideogramas::class.java) ?: continue
 
-                    // Obtém os dados do Ideograma
-                    val ideogram = ideogramSnapshot.getValue(Ideogramas::class.java)
-
-                    if (ideogram != null && kanjiId != null) {
-                        Log.d("Ideogram", "Kanji ID: $kanjiId, Kanjis da Categoria: $kanjisDaCategoria")
-
-                        if (kanjisDaCategoria.contains(kanjiId)) {
-                            val kanji = Kanji(
-                                id = kanjiId,  // O ID agora será o próprio ideograma
-                                imageUrl = ideogram.imagem ?: "",
-                                significado = ideogram.significado ?: "",
-                                onyomi = ideogram.onyomi ?: "",
-                                kunyomi = ideogram.kunyomi ?: "",
-                                qtd_tracos = ideogram.qtd_tracos ?: 0,
-                                frequencia = ideogram.frequencia ?: 0,
-                                exemplo1 = ideogram.exemplo1 ?: "",
-                                ex1_significado = ideogram.ex1_significado ?: "",
-                                exemplo2 = ideogram.exemplo2 ?: "",
-                                ex2_significado = ideogram.ex2_significado ?: "",
-                                exemplo3 = ideogram.exemplo3 ?: "",
-                                ex3_significado = ideogram.ex3_significado ?: "",
-                                exemplo4 = ideogram.exemplo4 ?: "",
-                                ex4_significado = ideogram.ex4_significado ?: ""
-                            )
-                            kanjiList.add(kanji)
-                            Log.d("KanjiList", "Kanji adicionado: ID = ${kanji.id}")
-                        }
-                    } else {
-                        Log.d("Ideogram", "Ideograma ou Kanji ID nulo detectado.")
+                    if (kanjisDaCategoria.contains(kanjiId)) {
+                        val kanji = Kanji(
+                            id = kanjiId,
+                            imageUrl = ideogram.imagem ?: "",
+                            significado = ideogram.significado ?: "",
+                            onyomi = ideogram.onyomi ?: "",
+                            kunyomi = ideogram.kunyomi ?: "",
+                            qtd_tracos = ideogram.qtd_tracos ?: 0,
+                            frequencia = ideogram.frequencia ?: 0,
+                            exemplo1 = ideogram.exemplo1 ?: "",
+                            ex1_significado = ideogram.ex1_significado ?: "",
+                            exemplo2 = ideogram.exemplo2 ?: "",
+                            ex2_significado = ideogram.ex2_significado ?: "",
+                            exemplo3 = ideogram.exemplo3 ?: "",
+                            ex3_significado = ideogram.ex3_significado ?: "",
+                            exemplo4 = ideogram.exemplo4 ?: "",
+                            ex4_significado = ideogram.ex4_significado ?: ""
+                        )
+                        kanjiList.add(kanji)
+                        Log.d("KanjiList", "Kanji adicionado: ID = ${kanji.id}")
                     }
                 }
                 Log.d("KanjiList", "Número de Kanjis encontrados: ${kanjiList.size}")

@@ -123,17 +123,11 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
                     // Se a categoria já existe, exibe uma mensagem de erro
                     Toast.makeText(requireContext(), "Categoria já existe!", Toast.LENGTH_SHORT).show()
                 } else {
-                    // Se não existe, adiciona a nova categoria
-                    val newCategoryRef = databaseReference.child(categoryName)
-                    newCategoryRef.setValue("Kanjis a serem adicionados").addOnCompleteListener { addTask ->
-                        if (addTask.isSuccessful) {
-                            Toast.makeText(requireContext(), "Categoria adicionada com sucesso!", Toast.LENGTH_SHORT).show()
-                            // Recarrega as categorias após a inserção
-                            loadCategories()
-                        } else {
-                            Toast.makeText(requireContext(), "Erro ao adicionar categoria", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                    // Se não existe, adiciona a nova categoria e vai para a activity de adicionar kanjis
+                    databaseReference.child(categoryName).setValue("") // Adiciona a categoria vazia
+                    val intent = Intent(activity, AddKanjisActivity::class.java)
+                    intent.putExtra("categoria", categoryName) // Passa o nome da nova categoria
+                    startActivity(intent)
                 }
             } else {
                 Toast.makeText(requireContext(), "Erro ao verificar categoria", Toast.LENGTH_SHORT).show()
