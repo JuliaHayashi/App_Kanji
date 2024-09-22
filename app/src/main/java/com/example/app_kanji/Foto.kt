@@ -118,7 +118,7 @@ class Foto : Fragment() {
             inputBuffer.loadBuffer(tensorImage.buffer)
 
             // Criar o buffer de saída com as dimensões esperadas [1, 9, 8400]
-            val outputBuffer = TensorBuffer.createFixedSize(intArrayOf(1, 9, 8400), DataType.FLOAT32)
+            val outputBuffer = TensorBuffer.createFixedSize(intArrayOf(1, 5, 8400), DataType.FLOAT32)
 
             // Executar a inferência
             interpreter?.run(inputBuffer.buffer, outputBuffer.buffer)
