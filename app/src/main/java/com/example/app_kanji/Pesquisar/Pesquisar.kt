@@ -93,15 +93,15 @@ class Pesquisar : Fragment(), KanjiClickListener {
         // Normalizar e remover acentos do texto de consulta
         val normalizedQuery = normalizeText(query.lowercase())
 
-        // Filtrar pelo ID (nome do kanji) e significados
+        // Filtrar pelo kanji (id) e significados
         val filteredList = allKanjiList.filter { kanji ->
-            val normalizedId = normalizeText(kanji.id.lowercase())
+            val normalizedKanji = normalizeText(kanji.id.lowercase()) // Acesse o campo kanji
             val normalizedSignificado = normalizeText(kanji.significado?.lowercase() ?: "")
 
-            val matchesId = normalizedId.contains(normalizedQuery)
+            val matchesKanji = normalizedKanji.contains(normalizedQuery)
             val matchesSignificado = normalizedSignificado.contains(normalizedQuery)
 
-            matchesId || matchesSignificado
+            matchesKanji || matchesSignificado
         }
 
         Log.d("FilterKanjis", "Filtered count: ${filteredList.size}")
@@ -119,6 +119,7 @@ class Pesquisar : Fragment(), KanjiClickListener {
                     if (ideogram != null) {
                         Log.d("FirebaseData", "Ideograma: $ideogram")
                         val kanji = Kanji(
+                            id = ideogramSnapshot.key ?: "", // Use a chave do snapshot como kanji
                             imageUrl = ideogram.imagem ?: "",
                             significado = ideogram.significado,
                             onyomi = ideogram.onyomi,
