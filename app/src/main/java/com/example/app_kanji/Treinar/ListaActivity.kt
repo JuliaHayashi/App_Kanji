@@ -73,7 +73,7 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
         builder.setTitle("Escolha uma ação")
         builder.setItems(arrayOf("Adicionar Kanji", "Renomear Categoria", "Excluir Categoria")) { _, which ->
             when (which) {
-                0 -> goToAddKanjiActivity() // Adiciona esta linha
+                0 -> goToAddKanjiActivity()
                 1 -> showRenameCategoryDialog()
                 2 -> showDeleteCategoryDialog()
             }
@@ -87,7 +87,6 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
         intent.putExtra("categoria", categoriaSelecionada) // Passa a categoria selecionada
         startActivity(intent)
     }
-
 
     private fun showRenameCategoryDialog() {
         val input = EditText(this)
@@ -172,7 +171,6 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
         }
     }
 
-
     override fun onClick(kanji: Kanji) {
         Log.d("ListaActivity", "Kanji selecionado: ${kanji.id}")
         val intent = Intent(this, Categoria_InfoActivity::class.java)
@@ -195,7 +193,7 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
                 } else {
                     Log.d("Categoria", "Nenhum dado encontrado para a categoria predefinida $categoriaSelecionada")
                 }
-                obterKanjisUsuarios()
+                obterKanjisDaCategoriaDoUsuario()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -204,21 +202,49 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
         })
     }
 
-    private fun obterKanjisUsuarios() {
-        val usuariosRef = databaseReference.child("Categorias").child("DosUsuarios")
-        usuariosRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                for (usuarioSnapshot in dataSnapshot.children) {
-                    usuarioSnapshot.child("1").getValue(String::class.java)?.let { kanjisString ->
+    private fun obterKanjisDaCategoriaDoUsuario() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        val testeRef = databaseReference.child("Categorias").child("DosUsuarios").child("dZOX5PdF94Ubc5Mc3Fg7NRoF5zx2").child(userId)
+        testeRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                Log.d("Teste", "Dados do snapshot: ${snapshot.value}")
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("Teste", "Erro ao acessar: ${databaseError.message}")
+            }
+        })
+
+
+        val categoria = categoriaSelecionada ?: run {
+            Log.e("CategoriaUsuario", "Categoria selecionada é nula")
+            return
+        }
+
+        val usuarioRef = databaseReference.child("Categorias").child("DosUsuarios").child(userId).child(categoria)
+        Log.d("CategoriaUsuario", "Acessando caminho: Categorias/DosUsuarios/$userId/$categoria")
+
+        usuarioRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                Log.d("CategoriaUsuario", "Dados do snapshot: ${snapshot.value}")
+
+                if (snapshot.exists()) {
+                    val kanjisString = snapshot.getValue(String::class.java)
+                    if (!kanjisString.isNullOrEmpty()) {
                         kanjisDaCategoria.addAll(kanjisString.split(",").map { it.trim() })
-                        Log.d("Categoria", "Kanjis da categoria do usuário $categoriaSelecionada: $kanjisDaCategoria")
+                        Log.d("CategoriaUsuario", "Kanjis da categoria do usuário $categoria: $kanjisDaCategoria")
+                    } else {
+                        Log.d("CategoriaUsuario", "Nenhum dado encontrado para a categoria do usuário $categoria")
                     }
+                } else {
+                    Log.d("CategoriaUsuario", "Categoria do usuário não existe: $categoria")
                 }
                 populateKanjis()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                Log.e("FirebaseData", "Database error: ${databaseError.message}")
+                Log.e("CategoriaUsuario", "Erro ao acessar a categoria do usuário: ${databaseError.message}")
             }
         })
     }

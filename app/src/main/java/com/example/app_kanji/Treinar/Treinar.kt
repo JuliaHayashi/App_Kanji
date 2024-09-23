@@ -43,7 +43,12 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
 
         dataList = arrayListOf()
         userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-        databaseReference = FirebaseDatabase.getInstance().getReference("DosUsuarios").child(userId)
+
+        // Atualiza o caminho para buscar corretamente as categorias criadas pelo usuário
+        databaseReference = FirebaseDatabase.getInstance()
+            .getReference("Categorias")       // Nó principal de Categorias
+            .child("DosUsuarios")             // Subnó para usuários
+            .child(userId)                    // Nó do ID do usuário
 
         // Carrega as categorias do usuário e pré-definidas
         loadCategories()
@@ -68,14 +73,6 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
         // Escuta as categorias do usuário
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                // Limpa a lista antes de adicionar categorias do banco
-                dataList.clear()
-
-                // Adiciona as categorias pré-definidas
-                for ((key, value) in titleMap) {
-                    dataList.add(DataClass(value))
-                }
-
                 // Adiciona as categorias do usuário
                 for (dataSnapshot in snapshot.children) {
                     val categoryName = dataSnapshot.key
@@ -116,15 +113,33 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
     }
 
     private fun addCategoryToDatabase(categoryName: String) {
-        // Verifica se a categoria já existe no banco de dados
-        databaseReference.child(categoryName).get().addOnCompleteListener { task ->
+        // Obtenha o ID do usuário autenticado
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+        // Verifique se o usuário está autenticado
+        if (userId == null) {
+            Toast.makeText(requireContext(), "Usuário não autenticado!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Caminho correto: Categorias -> DosUsuarios -> {userId} -> {categoria}
+        val userCategoryRef = FirebaseDatabase.getInstance()
+            .getReference("Categorias")       // Nó principal de Categorias
+            .child("DosUsuarios")             // Subnó para usuários
+            .child(userId)                    // Nó do ID do usuário
+            .child(categoryName)              // Nome da categoria específica
+
+        // Verifica se a categoria já existe para o usuário
+        userCategoryRef.get().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 if (task.result.exists()) {
                     // Se a categoria já existe, exibe uma mensagem de erro
                     Toast.makeText(requireContext(), "Categoria já existe!", Toast.LENGTH_SHORT).show()
                 } else {
-                    // Se não existe, adiciona a nova categoria e vai para a activity de adicionar kanjis
-                    databaseReference.child(categoryName).setValue("") // Adiciona a categoria vazia
+                    // Se a categoria não existe, cria a nova categoria
+                    userCategoryRef.setValue("") // Adiciona a categoria vazia
+
+                    // Vai para a Activity de adicionar kanjis
                     val intent = Intent(activity, AddKanjisActivity::class.java)
                     intent.putExtra("categoria", categoryName) // Passa o nome da nova categoria
                     startActivity(intent)

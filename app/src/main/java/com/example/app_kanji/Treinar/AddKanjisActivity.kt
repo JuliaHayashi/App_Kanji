@@ -37,7 +37,12 @@ class AddKanjisActivity : AppCompatActivity(), KanjiClickListener {
         userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
         categoryName = intent.getStringExtra("categoria") ?: ""
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("DosUsuarios").child(userId).child(categoryName)
+        // Caminho correto para adicionar kanjis: Categorias/DosUsuarios/{userId}/{categoryName}
+        databaseReference = FirebaseDatabase.getInstance()
+            .getReference("Categorias")     // Nó principal "Categorias"
+            .child("DosUsuarios")           // Subnó "DosUsuarios"
+            .child(userId)                  // Nó do ID do usuário
+            .child(categoryName)            // Nó da categoria
 
         kanjiList = mutableListOf()
         adapter = CardAdapter(kanjiList, this)
@@ -57,7 +62,7 @@ class AddKanjisActivity : AppCompatActivity(), KanjiClickListener {
     }
 
     private fun addKanjiToList(kanji: String) {
-        kanjiList.add(Kanji(id = kanji, imageUrl = "", significado = "")) // Adicione conforme seu modelo Kanji
+        kanjiList.add(Kanji(id = kanji, imageUrl = "", significado = "")) // Adiciona à lista de kanjis
         adapter.notifyDataSetChanged()
     }
 
