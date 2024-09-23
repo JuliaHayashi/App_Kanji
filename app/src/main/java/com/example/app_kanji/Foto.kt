@@ -144,7 +144,7 @@ class Foto : Fragment() {
 
                 // Redirecionar para a tela com as informações do Kanji
                 val intent = Intent(requireContext(), Kanji_InfoActivity::class.java)
-                intent.putExtra("KANJI_ID", identifiedLabel)  // Passar o nome do Kanji identificado
+                intent.putExtra("id", identifiedLabel)  // Passar o nome do Kanji identificado
                 startActivity(intent)
                 Log.d("Foto", "Kanji identificado: $identifiedLabel")
             
