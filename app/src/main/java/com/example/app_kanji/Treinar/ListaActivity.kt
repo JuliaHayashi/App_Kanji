@@ -205,18 +205,6 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
     private fun obterKanjisDaCategoriaDoUsuario() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
-        val testeRef = databaseReference.child("Categorias").child("DosUsuarios").child("dZOX5PdF94Ubc5Mc3Fg7NRoF5zx2").child(userId)
-        testeRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                Log.d("Teste", "Dados do snapshot: ${snapshot.value}")
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.e("Teste", "Erro ao acessar: ${databaseError.message}")
-            }
-        })
-
-
         val categoria = categoriaSelecionada ?: run {
             Log.e("CategoriaUsuario", "Categoria selecionada é nula")
             return

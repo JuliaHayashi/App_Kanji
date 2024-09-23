@@ -62,17 +62,17 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
     }
 
     private fun loadCategories() {
-        // Limpa a lista antes de carregar as novas categorias
-        dataList.clear()
-
-        // Adiciona categorias pré-definidas
-        for ((key, value) in titleMap) {
-            dataList.add(DataClass(value))
-        }
-
         // Escuta as categorias do usuário
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                // Limpa a lista antes de carregar as novas categorias para evitar duplicação
+                dataList.clear()
+
+                // Adiciona categorias pré-definidas
+                for ((key, value) in titleMap) {
+                    dataList.add(DataClass(value))
+                }
+
                 // Adiciona as categorias do usuário
                 for (dataSnapshot in snapshot.children) {
                     val categoryName = dataSnapshot.key
