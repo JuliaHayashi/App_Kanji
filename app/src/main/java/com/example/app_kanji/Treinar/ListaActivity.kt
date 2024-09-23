@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.app_kanji.MainActivity
 import com.example.app_kanji.Pesquisar.CardAdapter
 import com.example.app_kanji.Pesquisar.Ideogramas
 import com.example.app_kanji.Pesquisar.KANJI_ID_EXTRA
@@ -55,6 +56,10 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_lista, menu)
+
+        val editItem = menu?.findItem(R.id.edit_list)
+        editItem?.icon?.setTint(resources.getColor(R.color.white, theme))
+
         return true
     }
 
@@ -159,6 +164,12 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
                 userCategoryRef.child(title).removeValue().addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Log.d("ListaActivity", "Categoria $title excluída com sucesso.")
+
+                        // Redireciona para a MainActivity com o fragmento "treinar"
+                        val intent = Intent(this@ListaActivity, MainActivity::class.java)
+                        intent.putExtra("fragment", "treinar") // Passa o nome do fragmento
+                        startActivity(intent)
+                        finish() // Finaliza a ListaActivity
                     } else {
                         Log.e("ListaActivity", "Erro ao excluir categoria $title: ${task.exception?.message}")
                     }
@@ -170,6 +181,8 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
             Log.e("ListaActivity", "Erro ao acessar a categoria: ${exception.message}")
         }
     }
+
+
 
     override fun onClick(kanji: Kanji) {
         Log.d("ListaActivity", "Kanji selecionado: ${kanji.id}")

@@ -25,34 +25,66 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (FirebaseAuth.getInstance().currentUser == null) {
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        drawerLayout = findViewById(R.id.drawer_layout)
+        val navigationView = findViewById<NavigationView>(R.id.nav_view)
+
+        val toggle = ActionBarDrawerToggle(
+            this, drawerLayout, toolbar,
+            R.string.open_nav, R.string.close_nav
+        )
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        navigationView.setNavigationItemSelectedListener(this)
+
+    if (FirebaseAuth.getInstance().currentUser == null) {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()
         }
 
-        replaceFragment(Home())
-        binding.bottomNavigationView.setOnItemSelectedListener {
-
-            when(it.itemId){
-                R.id.home -> replaceFragment(Home())
-                R.id.foto -> replaceFragment(Foto())
-                R.id.treinar -> replaceFragment(Treinar())
-                R.id.pesquisar -> replaceFragment(Pesquisar())
-
-                else -> { }
+        // Verifica se há um fragmento a ser carregado a partir do Intent
+        intent.getStringExtra("fragment")?.let { fragmentName ->
+            when (fragmentName) {
+                "treinar" -> {
+                    replaceFragment(Treinar())
+                    binding.bottomNavigationView.selectedItemId = R.id.treinar // Seleciona o item "Treinar"
+                }
+                else -> {
+                    replaceFragment(Home())
+                    binding.bottomNavigationView.selectedItemId = R.id.home // Seleciona o item "Home"
+                }
             }
-            true
+        } ?: run {
+            replaceFragment(Home()) // Caso nenhum extra esteja presente
+            binding.bottomNavigationView.selectedItemId = R.id.home // Seleciona o item "Home" como padrão
         }
 
-        drawerLayout = findViewById(R.id.drawer_layout)
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        val navigationView = findViewById<NavigationView>(R.id.nav_view)
-        navigationView.setNavigationItemSelectedListener(this)
-        val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav, R.string.close_nav)
-        drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
+        binding.bottomNavigationView.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.home -> {
+                    replaceFragment(Home())
+                    true
+                }
+                R.id.foto -> {
+                    replaceFragment(Foto())
+                    true
+                }
+                R.id.treinar -> {
+                    replaceFragment(Treinar())
+                    true
+                }
+                R.id.pesquisar -> {
+                    replaceFragment(Pesquisar())
+                    true
+                }
+                else -> false
+            }
+        }
+
 
         /*binding.bottomNavigationView.setOnItemSelectedListener { menuItem ->
             if (menuItem.itemId == R.id.home) {
@@ -119,5 +151,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //        supportFragmentManager.beginTransaction()
 //            .replace(R.id.fragment_container, Configuracoes()).commit()
 
+        // Atualiza o título da Toolbar com base no fragmento
+        val title = when (fragment) {
+            is Home -> "Home"
+            is Foto -> "Foto"
+            is Treinar -> "Treinar"
+            is Pesquisar -> "Pesquisar"
+            else -> "App Kanji" // Título padrão
+        }
+        supportActionBar?.title = title // Atualiza o título da Toolbar
     }
 }
