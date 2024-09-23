@@ -1,8 +1,10 @@
 package com.example.app_kanji.Pesquisar
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.bumptech.glide.Glide
+import com.example.app_kanji.DesenhoActivity
 import com.example.app_kanji.R
 import com.example.app_kanji.databinding.ActivityKanjiInfoBinding
 
@@ -44,6 +46,10 @@ class Kanji_InfoActivity : AppCompatActivity() {
 
             binding.exemplo4.text = kanji.exemplo4
             binding.ex4Significado.text = kanji.ex4_significado
+        }
+        binding.treinarIcone.setOnClickListener {
+            val intent = Intent(this, DesenhoActivity::class.java)
+            startActivity(intent)
         }
     }
 
