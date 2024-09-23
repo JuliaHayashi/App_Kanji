@@ -15,6 +15,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.example.app_kanji.Pesquisar.KANJI_ID_EXTRA
+import com.example.app_kanji.Pesquisar.Kanji_InfoActivity
 import com.example.app_kanji.databinding.FragmentFotoBinding
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
@@ -67,7 +69,7 @@ class Foto : Fragment() {
     private fun setupInterpreter() {
         try {
             // Load the model and initialize the interpreter
-            val model = FileUtil.loadMappedFile(requireContext(), "best (1)_float32.tflite")
+            val model = FileUtil.loadMappedFile(requireContext(), "best_float32.tflite")
             interpreter = Interpreter(model)
 
             // Load labels from the file
@@ -118,7 +120,7 @@ class Foto : Fragment() {
             inputBuffer.loadBuffer(tensorImage.buffer)
 
             // Criar o buffer de saída com as dimensões esperadas [1, 9, 8400]
-            val outputBuffer = TensorBuffer.createFixedSize(intArrayOf(1, 5, 8400), DataType.FLOAT32)
+            val outputBuffer = TensorBuffer.createFixedSize(intArrayOf(1,9, 8400), DataType.FLOAT32)
 
             // Executar a inferência
             interpreter?.run(inputBuffer.buffer, outputBuffer.buffer)
@@ -133,15 +135,19 @@ class Foto : Fragment() {
             val maxScore = outputArray[maxIndex]
 
             // Verificar se a pontuação é 1.0 e exibir uma mensagem apropriada
-            if (maxScore == 1.0f) {
-                binding.resultTextView.text = "Nenhum resultado confiável encontrado."
-            } else {
+
                 // Mapear o índice para um label (se aplicável)
                 val identifiedLabel = if (maxIndex != -1) labels[maxIndex % labels.size] else "Nenhuma identificação"
 
                 // Exibir o resultado
                 binding.resultTextView.text = "Resultado: $identifiedLabel (pontuação: $maxScore)"
-            }
+
+                // Redirecionar para a tela com as informações do Kanji
+                val intent = Intent(requireContext(), Kanji_InfoActivity::class.java)
+                intent.putExtra("KANJI_ID", identifiedLabel)  // Passar o nome do Kanji identificado
+                startActivity(intent)
+                Log.d("Foto", "Kanji identificado: $identifiedLabel")
+            
 
         } catch (e: Exception) {
             Log.e("Foto", "Error processing image: ${e.message}")
