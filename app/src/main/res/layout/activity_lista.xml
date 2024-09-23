@@ -22,7 +22,9 @@
       android:fitsSystemWindows="true"
       app:layout_constraintTop_toTopOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toEndOf="parent" />
+      app:layout_constraintEnd_toEndOf="parent"
+      app:navigationIcon="@drawable/baseline_arrow_back_24" />
+
 
   <!-- RecyclerView para listar os kanjis -->
   <androidx.recyclerview.widget.RecyclerView

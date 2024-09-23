@@ -3,16 +3,27 @@ package com.example.app_kanji.Treinar
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.app_kanji.MainActivity
 import com.example.app_kanji.Pesquisar.CardAdapter
 import com.example.app_kanji.Pesquisar.Ideogramas
 import com.example.app_kanji.Pesquisar.KANJI_ID_EXTRA
 import com.example.app_kanji.Pesquisar.Kanji
 import com.example.app_kanji.Pesquisar.KanjiClickListener
 import com.example.app_kanji.R
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import android.graphics.Color
+import androidx.appcompat.widget.Toolbar
+import android.graphics.drawable.Drawable
+import androidx.core.graphics.drawable.DrawableCompat
+
 
 class ListaActivity : AppCompatActivity(), KanjiClickListener {
 
@@ -25,6 +36,20 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lista)
+
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+
+        // Definindo a cor do ícone de voltar
+        val backIcon: Drawable? = toolbar.navigationIcon
+        backIcon?.let {
+            DrawableCompat.setTint(it, Color.WHITE) // Altere para a cor desejada
+            toolbar.navigationIcon = it
+        }
+
 
         categoriaSelecionada = intent.getStringExtra("categoria")
 
@@ -45,6 +70,147 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
         obterKanjisDaCategoria()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_lista, menu)
+
+        val editItem = menu?.findItem(R.id.edit_list)
+        editItem?.icon?.setTint(resources.getColor(R.color.white, theme))
+
+        // Lista de categorias pré-definidas
+        val categoriasPredefinidas = listOf("adjetivos", "dias_semana", "numerais", "posicoes", "verbos")
+
+        // Verifica se a categoria selecionada está na lista de pré-definidas
+        if (categoriaSelecionada != null && categoriasPredefinidas.contains(categoriaSelecionada)) {
+            editItem?.isVisible = false // Oculta o item do menu
+        }
+
+        return true
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+            R.id.edit_list -> {
+                showEditOptionsDialog()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun showEditOptionsDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Escolha uma ação")
+        builder.setItems(arrayOf("Adicionar Kanji", "Renomear Categoria", "Excluir Categoria")) { _, which ->
+            when (which) {
+                0 -> goToAddKanjiActivity()
+                1 -> showRenameCategoryDialog()
+                2 -> showDeleteCategoryDialog()
+            }
+        }
+        builder.setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
+        builder.show()
+    }
+
+    private fun goToAddKanjiActivity() {
+        val intent = Intent(this, AddKanjisActivity::class.java)
+        intent.putExtra("categoria", categoriaSelecionada) // Passa a categoria selecionada
+        startActivity(intent)
+    }
+
+    private fun showRenameCategoryDialog() {
+        val input = EditText(this)
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Renomear Categoria")
+        builder.setView(input)
+
+        builder.setPositiveButton("Renomear") { dialog, _ ->
+            val newCategoryName = input.text.toString().trim()
+            if (newCategoryName.isNotEmpty()) {
+                renameCategory(categoriaSelecionada!!, newCategoryName)
+            }
+            dialog.dismiss()
+        }
+
+        builder.setNegativeButton("Cancelar") { dialog, _ -> dialog.cancel() }
+        builder.show()
+    }
+
+    private fun renameCategory(oldName: String, newName: String) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val userCategoryRef = databaseReference.child("Categorias").child("DosUsuarios").child(userId)
+
+        userCategoryRef.child(oldName).get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                val value = snapshot.value
+                userCategoryRef.child(newName).setValue(value).addOnCompleteListener { renameTask ->
+                    if (renameTask.isSuccessful) {
+                        userCategoryRef.child(oldName).removeValue().addOnCompleteListener { deleteTask ->
+                            if (deleteTask.isSuccessful) {
+                                Log.d("ListaActivity", "Categoria renomeada de $oldName para $newName")
+                            } else {
+                                Log.e("ListaActivity", "Erro ao remover a categoria antiga: ${deleteTask.exception?.message}")
+                            }
+                        }
+                    } else {
+                        Log.e("ListaActivity", "Erro ao adicionar a nova categoria: ${renameTask.exception?.message}")
+                    }
+                }
+            } else {
+                Log.e("ListaActivity", "A categoria antiga não existe.")
+            }
+        }.addOnFailureListener { exception ->
+            Log.e("ListaActivity", "Erro ao acessar a categoria: ${exception.message}")
+        }
+    }
+
+    private fun showDeleteCategoryDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Excluir Categoria")
+        builder.setMessage("Tem certeza que deseja excluir a categoria $categoriaSelecionada?")
+        builder.setPositiveButton("Sim") { dialog, _ ->
+            deleteCategory(categoriaSelecionada!!)
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("Não") { dialog, _ -> dialog.dismiss() }
+        builder.show()
+    }
+
+    private fun deleteCategory(title: String) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val userCategoryRef = databaseReference.child("Categorias").child("DosUsuarios").child(userId)
+
+        Log.d("ListaActivity", "Tentando excluir a categoria: $title em ${userCategoryRef.child(title).toString()}")
+
+        userCategoryRef.child(title).get().addOnSuccessListener { snapshot ->
+            Log.d("ListaActivity", "Snapshot: ${snapshot.value}") // Log do valor do snapshot
+            if (snapshot.exists()) {
+                Log.d("ListaActivity", "Categoria encontrada: $title")
+                userCategoryRef.child(title).removeValue().addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d("ListaActivity", "Categoria $title excluída com sucesso.")
+
+                        // Redireciona para a MainActivity com o fragmento "treinar"
+                        val intent = Intent(this@ListaActivity, MainActivity::class.java)
+                        intent.putExtra("fragment", "treinar") // Passa o nome do fragmento
+                        startActivity(intent)
+                        finish() // Finaliza a ListaActivity
+                    } else {
+                        Log.e("ListaActivity", "Erro ao excluir categoria $title: ${task.exception?.message}")
+                    }
+                }
+            } else {
+                Log.e("ListaActivity", "Categoria não existe: $title")
+            }
+        }.addOnFailureListener { exception ->
+            Log.e("ListaActivity", "Erro ao acessar a categoria: ${exception.message}")
+        }
+    }
+
     override fun onClick(kanji: Kanji) {
         Log.d("ListaActivity", "Kanji selecionado: ${kanji.id}")
         val intent = Intent(this, Categoria_InfoActivity::class.java)
@@ -53,7 +219,6 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
     }
 
     private fun obterKanjisDaCategoria() {
-        // Acessando categorias predefinidas
         val predefinidasRef = databaseReference.child("Categorias").child("Predefinidas").child(categoriaSelecionada!!)
         Log.d("FirebasePath", "Acessando caminho: Categorias/Predefinidas/$categoriaSelecionada")
 
@@ -68,7 +233,7 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
                 } else {
                     Log.d("Categoria", "Nenhum dado encontrado para a categoria predefinida $categoriaSelecionada")
                 }
-                obterKanjisUsuarios()  // Chama a função para buscar as categorias dos usuários
+                obterKanjisDaCategoriaDoUsuario()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -77,48 +242,41 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
         })
     }
 
-    private fun obterKanjisUsuarios() {
-        // Acessando categorias dos usuários
-        val usuariosRef = databaseReference.child("Categorias").child("DosUsuarios")
-        usuariosRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                for (usuarioSnapshot in dataSnapshot.children) {
-                    // Aqui estamos assumindo que você vai pegar todos os kanjis do usuário
-                    usuarioSnapshot.child("1").getValue(String::class.java)?.let { kanjisString ->
+    private fun obterKanjisDaCategoriaDoUsuario() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        val categoria = categoriaSelecionada ?: run {
+            Log.e("CategoriaUsuario", "Categoria selecionada é nula")
+            return
+        }
+
+        val usuarioRef = databaseReference.child("Categorias").child("DosUsuarios").child(userId).child(categoria)
+        Log.d("CategoriaUsuario", "Acessando caminho: Categorias/DosUsuarios/$userId/$categoria")
+
+        usuarioRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                Log.d("CategoriaUsuario", "Dados do snapshot: ${snapshot.value}")
+
+                if (snapshot.exists()) {
+                    val kanjisString = snapshot.getValue(String::class.java)
+                    if (!kanjisString.isNullOrEmpty()) {
                         kanjisDaCategoria.addAll(kanjisString.split(",").map { it.trim() })
-                        Log.d("Categoria", "Kanjis da categoria do usuário $categoriaSelecionada: $kanjisDaCategoria")
+                        Log.d("CategoriaUsuario", "Kanjis da categoria do usuário $categoria: $kanjisDaCategoria")
+                    } else {
+                        Log.d("CategoriaUsuario", "Nenhum dado encontrado para a categoria do usuário $categoria")
                     }
+                } else {
+                    Log.d("CategoriaUsuario", "Categoria do usuário não existe: $categoria")
                 }
-                // After fetching all kanji, populate the list
                 populateKanjis()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                Log.e("FirebaseData", "Database error: ${databaseError.message}")
+                Log.e("CategoriaUsuario", "Erro ao acessar a categoria do usuário: ${databaseError.message}")
             }
         })
+
     }
-    private fun obterKanjisDeCategoriasDosUsuarios() {
-        val usuariosRef = databaseReference.child("Categorias").child("DosUsuarios")
-
-        // Busca os dados de todos os usuários
-        usuariosRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                dataSnapshot.children.forEach { usuarioSnapshot ->
-                    usuarioSnapshot.child(categoriaSelecionada ?: return).getValue(String::class.java)?.split(",")?.map(String::trim)?.let {
-                        kanjisDaCategoria.addAll(it)
-                        Log.d("Categoria", "Kanjis da categoria do usuário ${usuarioSnapshot.key}: $it")
-                    }
-                }
-                populateKanjis() // Chama a função para atualizar a UI após processar todos os dados
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.e("FirebaseData", "Erro de banco de dados: ${databaseError.message}")
-            }
-        })
-    }
-
 
     private fun populateKanjis() {
         kanjiList.clear()
@@ -158,5 +316,6 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
                 Log.e("FirebaseData", "Database error: ${databaseError.message}")
             }
         })
+
     }
 }

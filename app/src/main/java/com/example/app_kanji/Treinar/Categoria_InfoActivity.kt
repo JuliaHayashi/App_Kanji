@@ -1,8 +1,11 @@
 package com.example.app_kanji.Treinar
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import com.bumptech.glide.Glide
+import com.example.app_kanji.DesenhoActivity
 import com.example.app_kanji.Pesquisar.Ideogramas
 import com.example.app_kanji.Pesquisar.KANJI_ID_EXTRA
 import com.example.app_kanji.R
@@ -18,6 +21,15 @@ class Categoria_InfoActivity : AppCompatActivity() {
         binding = ActivityKanjiInfoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Configura a Toolbar como ActionBar
+        setSupportActionBar(binding.toolbar)
+
+        // Ativa o botão de voltar na Toolbar
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.toolbar.navigationIcon = getDrawable(R.drawable.baseline_arrow_back_24)?.apply {
+            setTint(resources.getColor(android.R.color.white, theme))
+        }
+
         // Inicializando a referência ao Firebase
         databaseReference = FirebaseDatabase.getInstance().reference
 
@@ -30,6 +42,10 @@ class Categoria_InfoActivity : AppCompatActivity() {
         } else {
             // Log de erro ou mensagem de erro na interface, caso o ID seja inválido
             binding.significado.text = "Erro: ID do Kanji inválido."
+        }
+        binding.treinarIcone.setOnClickListener {
+            val intent = Intent(this, DesenhoActivity::class.java)
+            startActivity(intent)
         }
     }
 
@@ -56,6 +72,16 @@ class Categoria_InfoActivity : AppCompatActivity() {
                 binding.significado.text = "Erro ao acessar o banco de dados."
             }
         })
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                // Finaliza a Activity atual e volta para o fragment anterior
+                finish()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun atualizarUIComKanji(kanji: Ideogramas) {

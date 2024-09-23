@@ -23,7 +23,11 @@
         android:theme="@style/Theme.App_Kanji"
         tools:targetApi="31">
         <activity
+            android:name=".DesenhoActivity"
+            android:exported="false" />
+        <activity
             android:name=".Treinar.AddKanjisActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
             android:name=".Pesquisar.Kanji_InfoActivity"
@@ -33,7 +37,8 @@
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
-            android:exported="false"></activity>
+            android:exported="false" />
+
         <activity
             android:name=".Treinar.ListaActivity"
             android:exported="false" />
