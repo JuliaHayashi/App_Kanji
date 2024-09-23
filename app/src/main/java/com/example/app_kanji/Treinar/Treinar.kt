@@ -44,13 +44,11 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
         dataList = arrayListOf()
         userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
-        // Atualiza o caminho para buscar corretamente as categorias criadas pelo usuário
         databaseReference = FirebaseDatabase.getInstance()
-            .getReference("Categorias")       // Nó principal de Categorias
-            .child("DosUsuarios")             // Subnó para usuários
-            .child(userId)                    // Nó do ID do usuário
+            .getReference("Categorias")
+            .child("DosUsuarios")
+            .child(userId)
 
-        // Carrega as categorias do usuário e pré-definidas
         loadCategories()
 
         val addCategoriaButton: View = view.findViewById(R.id.addCategoria)
@@ -62,10 +60,8 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
     }
 
     private fun loadCategories() {
-        // Escuta as categorias do usuário
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                // Limpa a lista antes de carregar as novas categorias para evitar duplicação
                 dataList.clear()
 
                 // Adiciona categorias pré-definidas
@@ -77,11 +73,10 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
                 for (dataSnapshot in snapshot.children) {
                     val categoryName = dataSnapshot.key
                     categoryName?.let {
-                        dataList.add(DataClass(it)) // Adiciona o nome da categoria do usuário
+                        dataList.add(DataClass(it))
                     }
                 }
 
-                // Atualiza o adaptador com as novas categorias
                 adapter = AdapterClass(dataList, this@Treinar)
                 recyclerView.adapter = adapter
             }
@@ -113,7 +108,6 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
     }
 
     private fun addCategoryToDatabase(categoryName: String) {
-        // Obtenha o ID do usuário autenticado
         val userId = FirebaseAuth.getInstance().currentUser?.uid
 
         // Verifique se o usuário está autenticado
@@ -122,26 +116,28 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
             return
         }
 
-        // Caminho correto: Categorias -> DosUsuarios -> {userId} -> {categoria}
-        val userCategoryRef = FirebaseDatabase.getInstance()
-            .getReference("Categorias")       // Nó principal de Categorias
-            .child("DosUsuarios")             // Subnó para usuários
-            .child(userId)                    // Nó do ID do usuário
-            .child(categoryName)              // Nome da categoria específica
+        val forbiddenCategories = listOf("Adjetivos", "Dias da Semana", "Numerais", "Posições", "Verbos")
+        val trimmedCategoryName = categoryName.trim()
 
-        // Verifica se a categoria já existe para o usuário
+        if (forbiddenCategories.contains(trimmedCategoryName)) {
+            Toast.makeText(requireContext(), "Categoria não pode ser um dos nomes reservados!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val userCategoryRef = FirebaseDatabase.getInstance()
+            .getReference("Categorias")
+            .child("DosUsuarios")
+            .child(userId)
+            .child(trimmedCategoryName)
+
         userCategoryRef.get().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 if (task.result.exists()) {
-                    // Se a categoria já existe, exibe uma mensagem de erro
                     Toast.makeText(requireContext(), "Categoria já existe!", Toast.LENGTH_SHORT).show()
                 } else {
-                    // Se a categoria não existe, cria a nova categoria
-                    userCategoryRef.setValue("") // Adiciona a categoria vazia
-
-                    // Vai para a Activity de adicionar kanjis
+                    userCategoryRef.setValue("")
                     val intent = Intent(activity, AddKanjisActivity::class.java)
-                    intent.putExtra("categoria", categoryName) // Passa o nome da nova categoria
+                    intent.putExtra("categoria", trimmedCategoryName) // Passa o nome da nova categoria
                     startActivity(intent)
                 }
             } else {
@@ -151,7 +147,7 @@ class Treinar : Fragment(), AdapterClass.OnItemClickListener {
     }
 
     override fun onItemClick(title: String) {
-        val categoryId = titleMap.entries.find { it.value == title }?.key ?: title // Permite clicar nas categorias do usuário
+        val categoryId = titleMap.entries.find { it.value == title }?.key ?: title
 
         val intent = Intent(activity, ListaActivity::class.java)
         intent.putExtra("categoria", categoryId)

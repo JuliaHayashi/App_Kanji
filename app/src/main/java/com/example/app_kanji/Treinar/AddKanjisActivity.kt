@@ -53,12 +53,25 @@ class AddKanjisActivity : AppCompatActivity(), KanjiClickListener {
         kanjiRecyclerView.adapter = adapter
 
         saveButton.setOnClickListener {
-            val kanji = kanjiInput.text.toString()
+            val kanji = kanjiInput.text.toString().trim() // Remove espaços em branco
+
             if (kanji.isNotEmpty()) {
-                fetchKanjiImageUrl(kanji) { imageUrl ->
-                    addKanjiToList(kanji, imageUrl)
-                    saveKanjiToDatabase(kanji, imageUrl)
-                    kanjiInput.text.clear()
+                checkKanjiExists(kanji) { exists ->
+                    if (exists) {
+                        checkKanjiAlreadyAdded(kanji) { alreadyAdded ->
+                            if (!alreadyAdded) {
+                                fetchKanjiImageUrl(kanji) { imageUrl ->
+                                    addKanjiToList(kanji, imageUrl)
+                                    saveKanjiToDatabase(kanji, imageUrl)
+                                    kanjiInput.text.clear()
+                                }
+                            } else {
+                                Toast.makeText(this, "Kanji já adicionado", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } else {
+                        Toast.makeText(this, "Kanji não encontrado na base de dados", Toast.LENGTH_SHORT).show()
+                    }
                 }
             } else {
                 Toast.makeText(this, "Por favor, insira um Kanji", Toast.LENGTH_SHORT).show()
@@ -66,6 +79,23 @@ class AddKanjisActivity : AppCompatActivity(), KanjiClickListener {
         }
 
         loadExistingKanjis()
+    }
+
+    private fun checkKanjiExists(kanji: String, callback: (Boolean) -> Unit) {
+        val ideogramRef = FirebaseDatabase.getInstance().getReference("Ideogramas").child(kanji)
+        ideogramRef.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                callback(task.result?.exists() == true)
+            } else {
+                Log.e("AddKanjisActivity", "Erro ao verificar kanji: ${task.exception?.message}")
+                callback(false)
+            }
+        }
+    }
+
+    private fun checkKanjiAlreadyAdded(kanji: String, callback: (Boolean) -> Unit) {
+        val existingKanjis = kanjiList.map { it.id }
+        callback(existingKanjis.contains(kanji))
     }
 
     private fun fetchKanjiImageUrl(kanji: String, callback: (String) -> Unit) {
@@ -116,11 +146,13 @@ class AddKanjisActivity : AppCompatActivity(), KanjiClickListener {
                 kanjiList.clear() // Limpa a lista antes de carregar novos kanjis
                 if (!existingKanjis.isNullOrEmpty()) {
                     existingKanjis.split(",").forEach { kanji ->
-                        fetchKanjiImageUrl(kanji.trim()) { imageUrl ->
-                            addKanjiToList(kanji.trim(), imageUrl)
+                        val trimmedKanji = kanji.trim() // Remove espaços em branco
+                        fetchKanjiImageUrl(trimmedKanji) { imageUrl ->
+                            addKanjiToList(trimmedKanji, imageUrl)
                         }
                     }
                 } else {
+                    // sem kanji na categoria
                 }
             } else {
                 Toast.makeText(this, "Erro ao carregar Kanjis", Toast.LENGTH_SHORT).show()

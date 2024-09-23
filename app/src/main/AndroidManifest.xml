@@ -27,6 +27,7 @@
             android:exported="false" />
         <activity
             android:name=".Treinar.AddKanjisActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
             android:name=".Pesquisar.Kanji_InfoActivity"
@@ -37,6 +38,7 @@
         <activity
             android:name=".LoginActivity"
             android:exported="false" />
+
         <activity
             android:name=".Treinar.ListaActivity"
             android:exported="false" />
