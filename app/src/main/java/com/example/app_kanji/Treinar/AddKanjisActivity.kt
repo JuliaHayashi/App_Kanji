@@ -113,10 +113,14 @@ class AddKanjisActivity : AppCompatActivity(), KanjiClickListener {
         databaseReference.get().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val existingKanjis = task.result?.getValue(String::class.java)
-                existingKanjis?.split(",")?.forEach { kanji ->
-                    fetchKanjiImageUrl(kanji.trim()) { imageUrl ->
-                        addKanjiToList(kanji.trim(), imageUrl)
+                kanjiList.clear() // Limpa a lista antes de carregar novos kanjis
+                if (!existingKanjis.isNullOrEmpty()) {
+                    existingKanjis.split(",").forEach { kanji ->
+                        fetchKanjiImageUrl(kanji.trim()) { imageUrl ->
+                            addKanjiToList(kanji.trim(), imageUrl)
+                        }
                     }
+                } else {
                 }
             } else {
                 Toast.makeText(this, "Erro ao carregar Kanjis", Toast.LENGTH_SHORT).show()
