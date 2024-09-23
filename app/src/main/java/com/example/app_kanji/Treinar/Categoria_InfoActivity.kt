@@ -1,8 +1,10 @@
 package com.example.app_kanji.Treinar
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.bumptech.glide.Glide
+import com.example.app_kanji.DesenhoActivity
 import com.example.app_kanji.Pesquisar.Ideogramas
 import com.example.app_kanji.Pesquisar.KANJI_ID_EXTRA
 import com.example.app_kanji.R
@@ -30,6 +32,10 @@ class Categoria_InfoActivity : AppCompatActivity() {
         } else {
             // Log de erro ou mensagem de erro na interface, caso o ID seja inválido
             binding.significado.text = "Erro: ID do Kanji inválido."
+        }
+        binding.treinarIcone.setOnClickListener {
+            val intent = Intent(this, DesenhoActivity::class.java)
+            startActivity(intent)
         }
     }
 

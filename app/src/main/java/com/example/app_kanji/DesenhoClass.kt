@@ -9,59 +9,59 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 
-class DesenhoClass(context: Context?, attrs: AttributeSet?) : View(context, attrs){
+class DesenhoClass(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
-    val mainPaint: Paint
+    private val mainPaint: Paint
+    private var pathList = ArrayList<Path>()
 
     init {
-        mainPaint = Paint()
-        mainPaint.color = Color.BLACK
-        mainPaint.style = Paint.Style.STROKE
-        mainPaint.strokeWidth = 10f
+        mainPaint = Paint().apply {
+            color = Color.BLACK
+            style = Paint.Style.STROKE
+            strokeWidth = 10f
+        }
     }
 
-    var xPos = 0f
-    var yPos = 0f
+    private var xPos = 0f
+    private var yPos = 0f
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas.drawColor(Color.WHITE)
-        //canvas.drawCircle(xPos,yPos,100f,mainPaint)
-        if(!pathList.isEmpty()){
-            for(path in pathList){
-                canvas.drawPath(path,mainPaint)
-            }
+        canvas.drawColor(Color.WHITE) // Limpa o fundo
+        for (path in pathList) {
+            canvas.drawPath(path, mainPaint)
         }
-
-
     }
 
-
-    var pathList = ArrayList<Path>()
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if(event!!.action == MotionEvent.ACTION_DOWN){
-            xPos = event!!.x
-            yPos = event.y
-            invalidate()
+        event?.let {
+            when (it.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    xPos = it.x
+                    yPos = it.y
+                    invalidate()
 
-            val path = Path()
-            path.moveTo(xPos,yPos)
-            pathList.add(path)
+                    val path = Path()
+                    path.moveTo(xPos, yPos)
+                    pathList.add(path)
+                    return true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    xPos = it.x
+                    yPos = it.y
+                    pathList.lastOrNull()?.lineTo(xPos, yPos)
+                    invalidate()
+                    return true
+                }
 
-            return true
-        }else if(event.action ==MotionEvent.ACTION_MOVE){
-            xPos = event!!.x
-            yPos = event.y
-            invalidate()
-
-            pathList.get(pathList.size -1).lineTo(xPos,yPos)
-
-
-            return true
+                else -> {}
+            }
         }
-        else{
-            return false
-        }
+        return false
+    }
 
+    fun clear() {
+        pathList.clear() // Limpa a lista de caminhos
+        invalidate() // Requere que a view seja redesenhada
     }
 }
