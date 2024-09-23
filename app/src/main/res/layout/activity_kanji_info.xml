@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/white"
     android:layout_height="match_parent">
 
     <LinearLayout
@@ -71,8 +72,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="13sp"
+                            android:textColor="@color/black"
                             android:text="Traços"/>
                         <TextView
+                            android:textColor="@color/black"
                             android:id="@+id/qtd_tracos"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -91,6 +94,7 @@
                             android:id="@+id/frequencia_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/black"
                             android:textSize="13sp"
                             android:text="Frequência"/>
 
@@ -99,6 +103,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="21"
+                            android:textColor="@color/black"
                             android:textSize="16sp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -124,11 +129,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="13sp"
+                            android:textColor="@color/black"
                             android:text="JLPT"/>
                         <TextView
                             android:id="@+id/jlpt"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/black"
                             android:textSize="16sp"
                             android:text="N5"/>
                     </LinearLayout>
@@ -144,6 +151,7 @@
                             android:id="@+id/treinar_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/black"
                             android:textSize="13sp"
                             android:text="Treinar"/>
                         <ImageView
@@ -162,8 +170,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:textSize="18sp"
             android:textColor="@color/black"
+            android:textSize="18sp"
             android:gravity="center"
             android:text="Vida, genuíno, nascimento."/>
 
@@ -191,6 +199,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Onyomi"
+                    android:textColor="@color/black"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:layout_marginBottom="5dp"
@@ -198,6 +207,7 @@
                     android:padding="6dp" />
 
                 <TextView
+                    android:textColor="@color/black"
                     android:id="@+id/onyomi"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -225,6 +235,7 @@
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:layout_marginBottom="5dp"
+                    android:textColor="@color/black"
                     android:background="@drawable/rounded_rectangle"
                     android:padding="6dp" />
 
@@ -233,6 +244,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
+                    android:textColor="@color/black"
                     android:text="い(きる)、 う(む)、 お(う)、 は(える)、 なま"
                     android:textStyle="bold"/>
             </LinearLayout>
@@ -248,6 +260,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
+                android:textColor="@color/black"
                 android:textSize="17sp"
                 android:text="Exemplos"/>
             <View
@@ -260,6 +273,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
                 android:orientation="vertical"
                 android:layout_marginBottom="4dp">
 
@@ -268,6 +282,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
+                    android:textColor="@color/black"
                     android:layout_marginEnd="8dp"
                     android:text="私は9月に生まれました。"/>
 
@@ -276,6 +291,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
+                    android:textColor="@color/black"
                     android:text="Eu nasci em setembro."/>
             </LinearLayout>
 
@@ -297,6 +313,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
+                    android:textColor="@color/black"
                     android:layout_marginEnd="8dp"
                     android:text="あなたも学生ですか？"/>
 
@@ -305,6 +322,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
+                    android:textColor="@color/black"
                     android:text="Você também é estudante?"/>
             </LinearLayout>
 
@@ -326,6 +344,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
+                    android:textColor="@color/black"
                     android:layout_marginEnd="8dp"
                     android:text="もうすぐ赤ちゃんが生まれる。"/>
 
@@ -334,6 +353,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
+                    android:textColor="@color/black"
                     android:text="O bebê nascerá em breve."/>
             </LinearLayout>
 
@@ -353,6 +373,7 @@
                 <TextView
                     android:id="@+id/exemplo4"
                     android:layout_width="wrap_content"
+                    android:textColor="@color/black"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:layout_marginEnd="8dp"
@@ -360,6 +381,7 @@
 
                 <TextView
                     android:id="@+id/ex4_significado"
+                    android:textColor="@color/black"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
