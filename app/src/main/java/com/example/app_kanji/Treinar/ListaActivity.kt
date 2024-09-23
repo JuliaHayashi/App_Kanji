@@ -182,8 +182,6 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
         }
     }
 
-
-
     override fun onClick(kanji: Kanji) {
         Log.d("ListaActivity", "Kanji selecionado: ${kanji.id}")
         val intent = Intent(this, Categoria_InfoActivity::class.java)
