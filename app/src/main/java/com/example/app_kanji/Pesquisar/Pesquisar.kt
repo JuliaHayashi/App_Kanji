@@ -16,6 +16,9 @@
     import com.example.app_kanji.R
     import com.google.firebase.database.*
     import androidx.appcompat.widget.SearchView
+    import java.text.Normalizer
+    import java.util.regex.Pattern
+
 
     class Pesquisar : Fragment(), KanjiClickListener {
 
@@ -74,15 +77,24 @@
             return super.onOptionsItemSelected(item)
         }
 
+        private fun normalizeText(text: String): String {
+            val normalized = Normalizer.normalize(text, Normalizer.Form.NFD)
+            return Pattern.compile("\\p{InCombiningDiacriticalMarks}+").matcher(normalized).replaceAll("")
+        }
+
         private fun filterKanjis(query: String) {
             Log.d("FilterKanjis", "Query: $query")
 
-            val normalizedQuery = query.lowercase()
+            // Normalizar e remover acentos do texto de consulta
+            val normalizedQuery = normalizeText(query.lowercase())
 
             // Filtrar pelo ID (nome do kanji) e significados
             val filteredList = kanjiList.filter { kanji ->
-                val matchesId = kanji.id.lowercase().contains(normalizedQuery)
-                val matchesSignificado = kanji.significado?.lowercase()?.contains(normalizedQuery) == true
+                val normalizedId = normalizeText(kanji.id.lowercase())
+                val normalizedSignificado = normalizeText(kanji.significado?.lowercase() ?: "")
+
+                val matchesId = normalizedId.contains(normalizedQuery)
+                val matchesSignificado = normalizedSignificado.contains(normalizedQuery)
 
                 matchesId || matchesSignificado
             }
