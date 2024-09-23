@@ -19,6 +19,11 @@ import com.example.app_kanji.Pesquisar.KanjiClickListener
 import com.example.app_kanji.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import android.graphics.Color
+import androidx.appcompat.widget.Toolbar
+import android.graphics.drawable.Drawable
+import androidx.core.graphics.drawable.DrawableCompat
+
 
 class ListaActivity : AppCompatActivity(), KanjiClickListener {
 
@@ -32,8 +37,17 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lista)
 
-        val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+
+        val backIcon: Drawable? = toolbar.navigationIcon
+        backIcon?.let {
+            DrawableCompat.setTint(it, Color.WHITE)
+            toolbar.navigationIcon = it
+        }
 
         categoriaSelecionada = intent.getStringExtra("categoria")
 
@@ -65,6 +79,10 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
             R.id.edit_list -> {
                 showEditOptionsDialog()
                 true
@@ -246,6 +264,7 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
                 Log.e("CategoriaUsuario", "Erro ao acessar a categoria do usuário: ${databaseError.message}")
             }
         })
+
     }
 
     private fun populateKanjis() {
@@ -286,5 +305,6 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
                 Log.e("FirebaseData", "Database error: ${databaseError.message}")
             }
         })
+
     }
 }
