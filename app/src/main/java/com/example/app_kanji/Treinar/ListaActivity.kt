@@ -43,11 +43,13 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
+        // Definindo a cor do ícone de voltar
         val backIcon: Drawable? = toolbar.navigationIcon
         backIcon?.let {
-            DrawableCompat.setTint(it, Color.WHITE)
+            DrawableCompat.setTint(it, Color.WHITE) // Altere para a cor desejada
             toolbar.navigationIcon = it
         }
+
 
         categoriaSelecionada = intent.getStringExtra("categoria")
 
@@ -74,8 +76,17 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
         val editItem = menu?.findItem(R.id.edit_list)
         editItem?.icon?.setTint(resources.getColor(R.color.white, theme))
 
+        // Lista de categorias pré-definidas
+        val categoriasPredefinidas = listOf("adjetivos", "dias_semana", "numerais", "posicoes", "verbos")
+
+        // Verifica se a categoria selecionada está na lista de pré-definidas
+        if (categoriaSelecionada != null && categoriasPredefinidas.contains(categoriaSelecionada)) {
+            editItem?.isVisible = false // Oculta o item do menu
+        }
+
         return true
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
