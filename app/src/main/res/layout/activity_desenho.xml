@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/Blue_grey"
-    tools:context=".DesenhoActivity">
+    tools:context=".Desenhar.DesenhoActivity">
 
     <ImageView
         android:id="@+id/backButton"
@@ -17,6 +17,18 @@
         android:layout_marginStart="40dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:tint="@android:color/white" />
+
+    <ImageView
+        android:id="@+id/restartButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/baseline_restart_alt_24"
+        android:contentDescription="Botão de Reiniciar"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="40dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:tint="@android:color/white" />
 
     <TextView
@@ -31,7 +43,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="20dp" />
 
-    <com.example.app_kanji.DesenhoClass
+    <com.example.app_kanji.Desenhar.DesenhoClass
         android:id="@+id/myDrawingView"
         android:layout_width="330dp"
         android:layout_height="330dp"

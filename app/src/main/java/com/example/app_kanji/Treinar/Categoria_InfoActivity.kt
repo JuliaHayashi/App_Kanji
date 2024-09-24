@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import com.bumptech.glide.Glide
-import com.example.app_kanji.DesenhoActivity
+import com.example.app_kanji.Desenhar.DesenhoActivity
 import com.example.app_kanji.Pesquisar.Ideogramas
 import com.example.app_kanji.Pesquisar.KANJI_ID_EXTRA
 import com.example.app_kanji.R

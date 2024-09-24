@@ -1,4 +1,4 @@
-package com.example.app_kanji
+package com.example.app_kanji.Desenhar
 
 import android.content.Context
 import android.graphics.Canvas
