@@ -95,9 +95,7 @@ class Kanji_InfoActivity : AppCompatActivity() {
             } else {
                 binding.significado.text = "Kanji não encontrado."
             }
-        } else {
-            // Caso não tenha sido passado um ID, uma mensagem de erro é exibida
-            binding.significado.text = "Erro: Nenhum Kanji encontrado."
+
         }
 
     }

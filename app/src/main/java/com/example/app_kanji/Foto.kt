@@ -11,11 +11,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.example.app_kanji.Pesquisar.KANJI_ID_EXTRA
 import com.example.app_kanji.Pesquisar.Kanji_InfoActivity
 import com.example.app_kanji.databinding.FragmentFotoBinding
 import org.tensorflow.lite.DataType
@@ -40,16 +40,14 @@ class Foto : Fragment() {
     ): View {
         binding = FragmentFotoBinding.inflate(inflater, container, false)
 
-        // Check camera permissions
-        checkPermissions()
-
-        // Setup TensorFlow Lite interpreter and load labels
-        setupInterpreter()
-
         // Handle camera button click
         binding.btnTirarFoto.setOnClickListener {
-            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            takePictureLauncher.launch(takePictureIntent)
+            if (hasCameraPermission()) {
+                val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                takePictureLauncher.launch(takePictureIntent)
+            } else {
+                requestCameraPermission()
+            }
         }
 
         // Handle gallery button click
@@ -57,15 +55,46 @@ class Foto : Fragment() {
             galleryLauncher.launch("image/*")
         }
 
+        // Setup TensorFlow Lite interpreter and load labels
+        setupInterpreter()
+
         return binding.root
     }
 
-    private fun checkPermissions() {
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
+    // Check if camera permission is granted
+    private fun hasCameraPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    // Request camera permission
+    private fun requestCameraPermission() {
+        ActivityCompat.requestPermissions(
+            requireActivity(),
+            arrayOf(Manifest.permission.CAMERA),
+            REQUEST_CAMERA_PERMISSION
+        )
+    }
+
+    // Handle permission result
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
+        if (requestCode == REQUEST_CAMERA_PERMISSION && grantResults.isNotEmpty() &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED
+        ) {
+            // Permission granted, open the camera
+            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            takePictureLauncher.launch(takePictureIntent)
+        } else {
+            // Permission denied, show a message
+            Toast.makeText(requireContext(), "Permissão da câmera negada", Toast.LENGTH_SHORT).show()
         }
     }
 
+    // Load the TensorFlow model and labels
     private fun setupInterpreter() {
         try {
             // Load the model and initialize the interpreter
@@ -88,24 +117,30 @@ class Foto : Fragment() {
         }
     }
 
-    private val takePictureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val imageBitmap = result.data?.extras?.get("data") as? Bitmap
-            imageBitmap?.let {
-                binding.imageView.setImageBitmap(it)
-                processImage(it)
+    // Launcher for taking pictures
+    private val takePictureLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val imageBitmap = result.data?.extras?.get("data") as? Bitmap
+                imageBitmap?.let {
+                    binding.imageView.setImageBitmap(it)
+                    processImage(it)
+                }
             }
         }
-    }
 
-    private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let {
-            val imageBitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, it)
-            binding.imageView.setImageBitmap(imageBitmap)
-            processImage(imageBitmap)
+    // Launcher for selecting image from gallery
+    private val galleryLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            uri?.let {
+                val imageBitmap =
+                    MediaStore.Images.Media.getBitmap(requireContext().contentResolver, it)
+                binding.imageView.setImageBitmap(imageBitmap)
+                processImage(imageBitmap)
+            }
         }
-    }
 
+    // Process the image and identify the Kanji
     private fun processImage(image: Bitmap) {
         try {
             val inputSize = 640  // Modelo espera 640x640 pixels
@@ -120,7 +155,7 @@ class Foto : Fragment() {
             inputBuffer.loadBuffer(tensorImage.buffer)
 
             // Criar o buffer de saída com as dimensões esperadas [1, 9, 8400]
-            val outputBuffer = TensorBuffer.createFixedSize(intArrayOf(1,9, 8400), DataType.FLOAT32)
+            val outputBuffer = TensorBuffer.createFixedSize(intArrayOf(1, 9, 8400), DataType.FLOAT32)
 
             // Executar a inferência
             interpreter?.run(inputBuffer.buffer, outputBuffer.buffer)
@@ -134,29 +169,24 @@ class Foto : Fragment() {
             val maxIndex = outputArray.indices.maxByOrNull { outputArray[it] } ?: -1
             val maxScore = outputArray[maxIndex]
 
-            // Verificar se a pontuação é 1.0 e exibir uma mensagem apropriada
+            // Verificar se o score é 1.0, indicando "Nenhuma identificação"
 
-                // Mapear o índice para um label (se aplicável)
-                val identifiedLabel = if (maxIndex != -1) labels[maxIndex % labels.size] else "Nenhuma identificação"
+                // Verificar se a pontuação é válida e redirecionar para a tela com as informações do Kanji
+            val identifiedLabel = if (maxIndex != -1) labels[maxIndex % labels.size] else "Nenhuma identificação"
+            binding.resultTextView.text = "Resultado: $identifiedLabel (pontuação: $maxScore)"
 
-                // Exibir o resultado
-                binding.resultTextView.text = "Resultado: $identifiedLabel (pontuação: $maxScore)"
+            val intent = Intent(requireContext(), Kanji_InfoActivity::class.java)
+            intent.putExtra("id", identifiedLabel)  // Passar o nome do Kanji identificado
+            startActivity(intent)
 
-                // Redirecionar para a tela com as informações do Kanji
-                val intent = Intent(requireContext(), Kanji_InfoActivity::class.java)
-                intent.putExtra("id", identifiedLabel)  // Passar o nome do Kanji identificado
-                startActivity(intent)
-                Log.d("Foto", "Kanji identificado: $identifiedLabel")
-            
+            Log.d("Foto", "Kanji identificado: $identifiedLabel")
+
 
         } catch (e: Exception) {
             Log.e("Foto", "Error processing image: ${e.message}")
             binding.resultTextView.text = "Erro durante o processamento: ${e.message}"
         }
     }
-
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()
