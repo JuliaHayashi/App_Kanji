@@ -23,7 +23,7 @@ class DesenhoClass(context: Context?, attrs: AttributeSet?) : View(context, attr
         mainPaint = Paint().apply {
             color = Color.BLACK
             style = Paint.Style.STROKE
-            strokeWidth = 18f
+            strokeWidth = 22f
             strokeJoin = Paint.Join.ROUND
             strokeCap = Paint.Cap.ROUND
         }

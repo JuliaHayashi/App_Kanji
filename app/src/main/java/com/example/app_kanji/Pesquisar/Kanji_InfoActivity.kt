@@ -59,8 +59,12 @@ class Kanji_InfoActivity : AppCompatActivity() {
         }
         binding.treinarIcone.setOnClickListener {
             val intent = Intent(this, DesenhoActivity::class.java)
+            if (kanji != null) {
+                intent.putExtra("KANJI_IMAGE_URL", kanji.imageUrl)
+            }
             startActivity(intent)
         }
+
         val receivedKanjiID = intent.getStringExtra("id")
 
         if (receivedKanjiID != null) {
