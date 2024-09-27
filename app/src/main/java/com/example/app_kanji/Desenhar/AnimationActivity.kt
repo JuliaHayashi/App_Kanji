@@ -1,6 +1,7 @@
 package com.example.app_kanji.Desenhar
 
-import android.animation.ObjectAnimator
+import android.animation.Animator
+import android.animation.ValueAnimator
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
@@ -22,6 +23,9 @@ class AnimationActivity : AppCompatActivity() {
     private val strokeDelay: Long = 500 // Tempo de atraso entre cada traço (em milissegundos)
     private var currentStrokeIndex = 0
     private lateinit var paths: List<Path>
+    private lateinit var bitmap: Bitmap
+    private lateinit var canvas: Canvas
+    private lateinit var paint: Paint
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,8 +34,20 @@ class AnimationActivity : AppCompatActivity() {
         svgImageView = findViewById(R.id.svgImageView)
         backButton = findViewById(R.id.backButton)
 
+        // Inicializa o bitmap e o canvas
+        bitmap = Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
+        canvas = Canvas(bitmap)
+        canvas.drawColor(Color.WHITE) // Cor de fundo
+
+        // Inicializa a pintura
+        paint = Paint().apply {
+            style = Paint.Style.STROKE
+            strokeWidth = 3f // Largura do traço
+            color = Color.BLACK
+        }
+
         // Carrega o SVG a partir do recurso raw
-        loadSvgFromResource(R.raw.u8a71)
+        loadSvgFromResource(R.raw.u59b9)
 
         // Configura o botão de voltar
         backButton.setOnClickListener {
@@ -93,41 +109,61 @@ class AnimationActivity : AppCompatActivity() {
         // Verifica se ainda há traços para desenhar
         if (currentStrokeIndex < paths.size) {
             // Anima o traço atual
-            animatePath(currentStrokeIndex)
-
-            // Aumenta o índice do traço atual
-            currentStrokeIndex++
-
-            // Chama a próxima animação após um atraso
-            handler.postDelayed({ drawNextStroke() }, strokeDelay)
+            animatePath(currentStrokeIndex) {
+                currentStrokeIndex++ // Aumenta o índice do traço atual após a animação
+                // Chama a próxima animação após um atraso
+                handler.postDelayed({ drawNextStroke() }, strokeDelay)
+            }
         }
     }
 
-    private fun animatePath(index: Int) {
-        // Cria um Canvas e desenha o caminho atual
-        val bitmap = Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        canvas.drawColor(Color.WHITE) // Cor de fundo
+    private fun animatePath(index: Int, onComplete: () -> Unit) {
+        val path = paths[index]
+        val pathMeasure = PathMeasure(path, false)
 
-        // Define a pintura para o traço
-        val paint = Paint().apply {
-            style = Paint.Style.STROKE
-            strokeWidth = 3f // Largura do traço
-            color = Color.BLACK
+        // Cria um ValueAnimator para animar o traço
+        val animator = ValueAnimator.ofFloat(0f, pathMeasure.length)
+        animator.duration = 2000 // Duração da animação para cada traço
+        animator.addUpdateListener { animation ->
+            val length = animation.animatedValue as Float
+
+            // Limpa o canvas apenas na primeira animação
+            if (currentStrokeIndex == 0 && index == 0) {
+                canvas.drawColor(Color.WHITE) // Limpa o canvas apenas na primeira animação
+            }
+
+            // Cria um novo path que representará o traço animado
+            val animatedPath = Path()
+            pathMeasure.getSegment(0f, length, animatedPath, true)
+
+            // Desenha o path animado no canvas
+            canvas.drawPath(animatedPath, paint)
+
+            // Cria um PictureDrawable a partir do bitmap atualizado
+            val animatedDrawable = BitmapDrawable(resources, bitmap)
+
+            // Define o drawable animado no ImageView
+            svgImageView.setImageDrawable(animatedDrawable)
         }
 
-        // Desenha o caminho atual
-        canvas.drawPath(paths[index], paint)
+        animator.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {
+                // Lógica opcional para quando a animação começa
+            }
 
-        // Cria um PictureDrawable a partir do bitmap
-        val animatedDrawable = BitmapDrawable(resources, bitmap)
+            override fun onAnimationEnd(animation: Animator) {
+                onComplete() // Chama a função de conclusão ao final da animação
+            }
 
-        // Define o drawable animado no ImageView
-        svgImageView.setImageDrawable(animatedDrawable)
+            override fun onAnimationCancel(animation: Animator) {
+                // Lógica opcional para quando a animação é cancelada
+            }
 
-        // Anima a opacidade do ImageView
-        val animator = ObjectAnimator.ofFloat(svgImageView, "alpha", 0f, 1f)
-        animator.duration = 300 // Duração da animação para cada traço
+            override fun onAnimationRepeat(animation: Animator) {
+                // Lógica opcional para quando a animação é repetida
+            }
+        })
+
         animator.start()
     }
 }
