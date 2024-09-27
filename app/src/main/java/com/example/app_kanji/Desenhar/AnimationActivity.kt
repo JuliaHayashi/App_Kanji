@@ -6,6 +6,8 @@ import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.os.Handler
+import android.view.MotionEvent
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.PathParser
@@ -35,7 +37,7 @@ class AnimationActivity : AppCompatActivity() {
         backButton = findViewById(R.id.backButton)
 
         // Inicializa o bitmap e o canvas
-        bitmap = Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
+        bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
         canvas = Canvas(bitmap)
         canvas.drawColor(Color.WHITE) // Cor de fundo
 
@@ -106,16 +108,30 @@ class AnimationActivity : AppCompatActivity() {
     }
 
     private fun drawNextStroke() {
-        // Verifica se ainda há traços para desenhar
         if (currentStrokeIndex < paths.size) {
-            // Anima o traço atual
             animatePath(currentStrokeIndex) {
-                currentStrokeIndex++ // Aumenta o índice do traço atual após a animação
-                // Chama a próxima animação após um atraso
-                handler.postDelayed({ drawNextStroke() }, strokeDelay)
+                val drawingView: DrawingView = findViewById(R.id.drawingView)
+                drawingView.reset() // Limpar qualquer desenho anterior
+                drawingView.visibility = View.VISIBLE // Tornar a view visível para o desenho
+
+                drawingView.setOnTouchListener { _, event ->
+                    if (event.action == MotionEvent.ACTION_UP) {
+                        // Aqui você pode validar o desenho do usuário
+                        // Se correto, chamar a próxima animação
+                        currentStrokeIndex++ // Aumentar o índice do traço atual
+                        drawNextStroke() // Chamar o próximo traço
+                        drawingView.visibility = View.GONE // Esconder a DrawingView
+                    }
+                    true
+                }
             }
+        } else {
+            // Esconder a DrawingView após todos os traços serem desenhados
+            val drawingView: DrawingView = findViewById(R.id.drawingView)
+            drawingView.visibility = View.GONE
         }
     }
+
 
     private fun animatePath(index: Int, onComplete: () -> Unit) {
         val path = paths[index]
@@ -123,7 +139,7 @@ class AnimationActivity : AppCompatActivity() {
 
         // Cria um ValueAnimator para animar o traço
         val animator = ValueAnimator.ofFloat(0f, pathMeasure.length)
-        animator.duration = 2000 // Duração da animação para cada traço
+        animator.duration = 500 // Duração da animação para cada traço
         animator.addUpdateListener { animation ->
             val length = animation.animatedValue as Float
 
