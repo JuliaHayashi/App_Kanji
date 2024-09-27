@@ -77,11 +77,20 @@
             android:layout_gravity="start" />
 
         <ImageView
+            android:id="@+id/animationButton"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="20dp"
+            android:layout_gravity="end"
+            android:contentDescription="Ver animação do Kanji"
+            android:src="@drawable/baseline_draw_24" />
+
+        <ImageView
             android:id="@+id/restartButton"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginStart="200dp"
+            android:layout_marginStart="150dp"
             android:contentDescription="Botão de Reiniciar"
             android:src="@drawable/baseline_restart_alt_24" />
 

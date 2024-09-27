@@ -1,5 +1,6 @@
 package com.example.app_kanji.Desenhar
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.view.View
@@ -34,6 +35,16 @@ class DesenhoActivity : AppCompatActivity() {
         restartButton.setOnClickListener {
             desenhoView.clear()
         }
+
+        val animationButton = findViewById<ImageView>(R.id.animationButton)
+
+        animationButton.setOnClickListener {
+            val intent = Intent(this, AnimationActivity::class.java)
+            intent.putExtra("KANJI_SVG_RESOURCE_ID", R.raw.u4e00) // Substitua 'seu_svg' pelo nome do seu arquivo SVG
+            startActivity(intent)
+
+        }
+
 
         // Recebe a URL da imagem do kanji da atividade anterior
         val kanjiImageUrl = intent.getStringExtra("KANJI_IMAGE_URL")
