@@ -74,7 +74,6 @@ class Foto : Fragment(), KanjiClickListener {
             galleryLauncher.launch("image/*")
         }
 
-        databaseReference = FirebaseDatabase.getInstance().reference.child("Ideogramas")
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
 
@@ -82,7 +81,7 @@ class Foto : Fragment(), KanjiClickListener {
 
         recyclerView.adapter = adapter
 
-        populateKanjis() // Carregar os Kanjis do Firebase
+        // Não chama `populateKanjis()` aqui para evitar a exibição inicial
 
         return binding.root
     }
@@ -138,6 +137,9 @@ class Foto : Fragment(), KanjiClickListener {
     // Função para processar a imagem e realizar OCR japonês
     private fun processImageForOCR(bitmap: Bitmap) {
         try {
+            // Inicializa o databaseReference aqui antes de chamar populateKanjis()
+            databaseReference = FirebaseDatabase.getInstance().reference.child("Ideogramas")
+
             // Criação do objeto InputImage para OCR
             val image = InputImage.fromBitmap(bitmap, 0)
             val recognizer = TextRecognition.getClient(JapaneseTextRecognizerOptions.Builder().build())
@@ -166,7 +168,8 @@ class Foto : Fragment(), KanjiClickListener {
                         // Atualiza o TextView com a lista de Kanjis encontrados
                         if (kanjiList.isNotEmpty()) {
                             binding.resultTextView.text = "Kanjis encontrados: ${kanjiList.joinToString(", ")}"
-                            filterKanjis() // Chama a função de filtragem
+                            // Popula os Kanjis após o OCR ser bem-sucedido
+                            populateKanjis()
                         } else {
                             binding.resultTextView.text = "Nenhum Kanji encontrado"
                             adapter.updateList(emptyList()) // Limpa a lista do adapter
@@ -185,6 +188,7 @@ class Foto : Fragment(), KanjiClickListener {
             Log.e("FotoFragment", "Erro ao preparar imagem para OCR: ${e.message}")
         }
     }
+    
 
     // Função de extensão para verificar se um caractere é um Kanji
     private fun Char.isKanji(): Boolean {
@@ -199,26 +203,29 @@ class Foto : Fragment(), KanjiClickListener {
                     val kanjiId = ideogramSnapshot.key ?: continue
                     val ideogram = ideogramSnapshot.getValue(Ideogramas::class.java) ?: continue
 
-                    // Cria um objeto Kanji e o adiciona à lista
-                    val kanji = Kanji(
-                        id = kanjiId,
-                        imageUrl = ideogram.imagem ?: "",
-                        significado = ideogram.significado ?: "",
-                        onyomi = ideogram.onyomi ?: "",
-                        kunyomi = ideogram.kunyomi ?: "",
-                        qtd_tracos = ideogram.qtd_tracos ?: 0,
-                        frequencia = ideogram.frequencia ?: 0,
-                        exemplo1 = ideogram.exemplo1 ?: "",
-                        ex1_significado = ideogram.ex1_significado ?: "",
-                        exemplo2 = ideogram.exemplo2 ?: "",
-                        ex2_significado = ideogram.ex2_significado ?: "",
-                        exemplo3 = ideogram.exemplo3 ?: "",
-                        ex3_significado = ideogram.ex3_significado ?: "",
-                        exemplo4 = ideogram.exemplo4 ?: "",
-                        ex4_significado = ideogram.ex4_significado ?: ""
-                    )
-                    kanjis.add(kanji) // Adiciona o objeto Kanji à lista
-                    Log.d("KanjiList", "Kanji adicionado: ID = ${kanji.id}")
+                    // Adiciona o Kanji apenas se ele for reconhecido pelo OCR
+                    if (kanjiId in kanjiList) {
+                        // Cria um objeto Kanji e o adiciona à lista
+                        val kanji = Kanji(
+                            id = kanjiId,
+                            imageUrl = ideogram.imagem ?: "",
+                            significado = ideogram.significado ?: "",
+                            onyomi = ideogram.onyomi ?: "",
+                            kunyomi = ideogram.kunyomi ?: "",
+                            qtd_tracos = ideogram.qtd_tracos ?: 0,
+                            frequencia = ideogram.frequencia ?: 0,
+                            exemplo1 = ideogram.exemplo1 ?: "",
+                            ex1_significado = ideogram.ex1_significado ?: "",
+                            exemplo2 = ideogram.exemplo2 ?: "",
+                            ex2_significado = ideogram.ex2_significado ?: "",
+                            exemplo3 = ideogram.exemplo3 ?: "",
+                            ex3_significado = ideogram.ex3_significado ?: "",
+                            exemplo4 = ideogram.exemplo4 ?: "",
+                            ex4_significado = ideogram.ex4_significado ?: ""
+                        )
+                        kanjis.add(kanji) // Adiciona o objeto Kanji à lista
+                        Log.d("KanjiList", "Kanji adicionado: ID = ${kanji.id}")
+                    }
                 }
                 Log.d("KanjiList", "Número de Kanjis encontrados: ${kanjis.size}")
                 adapter.notifyDataSetChanged() // Notifica o adapter sobre a mudança de dados
@@ -230,19 +237,10 @@ class Foto : Fragment(), KanjiClickListener {
         })
     }
 
-    private fun filterKanjis() {
-        // Filtra a lista de kanjis reconhecidos
-        val filteredKanjis = kanjis.filter { kanji ->
-            kanji.id in kanjiList // Verifica se o ID do Kanji está na lista de Kanjis reconhecidos
-        }
-
-        // Atualiza o adapter com os Kanjis filtrados
-        adapter.updateList(filteredKanjis)
-    }
-
     override fun onClick(kanji: Kanji) {
         val intent = Intent(requireContext(), Kanji_InfoActivity::class.java)
         intent.putExtra(KANJI_ID_EXTRA, kanji.id)
+        Log.e("FotoFragment", "Id achado: ${kanji.id}")
         startActivity(intent)
     }
 }
