@@ -15,20 +15,37 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.example.app_kanji.Pesquisar.CardAdapter
+import com.example.app_kanji.Pesquisar.Ideogramas
+import com.example.app_kanji.Pesquisar.KANJI_ID_EXTRA
+import com.example.app_kanji.Pesquisar.Kanji
+import com.example.app_kanji.Pesquisar.KanjiClickListener
+import com.example.app_kanji.Pesquisar.Kanji_InfoActivity
 import com.example.app_kanji.databinding.FragmentFotoBinding
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
 
-class Foto : Fragment() {
+class Foto : Fragment(), KanjiClickListener {
 
     private lateinit var binding: FragmentFotoBinding
     private lateinit var takePictureLauncher: ActivityResultLauncher<Intent>
     private lateinit var galleryLauncher: ActivityResultLauncher<String>
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var databaseReference: DatabaseReference
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: CardAdapter
+    private val kanjis = mutableListOf<Kanji>()
 
     // Lista para armazenar os Kanjis reconhecidos
     private val kanjiList = mutableListOf<String>()
@@ -38,7 +55,6 @@ class Foto : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentFotoBinding.inflate(inflater, container, false)
-
         setupActivityResultLaunchers()
 
         // Botão para capturar uma foto pela câmera
@@ -57,6 +73,16 @@ class Foto : Fragment() {
         binding.btnFoto.setOnClickListener {
             galleryLauncher.launch("image/*")
         }
+
+        databaseReference = FirebaseDatabase.getInstance().reference.child("Ideogramas")
+        recyclerView = binding.recyclerView
+        recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+
+        adapter = CardAdapter(kanjis, this)
+
+        recyclerView.adapter = adapter
+
+        populateKanjis() // Carregar os Kanjis do Firebase
 
         return binding.root
     }
@@ -140,16 +166,20 @@ class Foto : Fragment() {
                         // Atualiza o TextView com a lista de Kanjis encontrados
                         if (kanjiList.isNotEmpty()) {
                             binding.resultTextView.text = "Kanjis encontrados: ${kanjiList.joinToString(", ")}"
+                            filterKanjis() // Chama a função de filtragem
                         } else {
                             binding.resultTextView.text = "Nenhum Kanji encontrado"
+                            adapter.updateList(emptyList()) // Limpa a lista do adapter
                         }
                     } else {
                         binding.resultTextView.text = "Nenhum texto reconhecido"
+                        adapter.updateList(emptyList()) // Limpa a lista do adapter
                     }
                 }
                 .addOnFailureListener { e ->
                     Log.e("FotoFragment", "Erro ao processar OCR: ${e.message}")
                     binding.resultTextView.text = "Erro ao processar a imagem"
+                    adapter.updateList(emptyList()) // Limpa a lista do adapter
                 }
         } catch (e: Exception) {
             Log.e("FotoFragment", "Erro ao preparar imagem para OCR: ${e.message}")
@@ -159,5 +189,60 @@ class Foto : Fragment() {
     // Função de extensão para verificar se um caractere é um Kanji
     private fun Char.isKanji(): Boolean {
         return this in '\u4E00'..'\u9FAF'
+    }
+
+    private fun populateKanjis() {
+        kanjis.clear() // Limpa a lista para evitar duplicatas
+        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (ideogramSnapshot in dataSnapshot.children) {
+                    val kanjiId = ideogramSnapshot.key ?: continue
+                    val ideogram = ideogramSnapshot.getValue(Ideogramas::class.java) ?: continue
+
+                    // Cria um objeto Kanji e o adiciona à lista
+                    val kanji = Kanji(
+                        id = kanjiId,
+                        imageUrl = ideogram.imagem ?: "",
+                        significado = ideogram.significado ?: "",
+                        onyomi = ideogram.onyomi ?: "",
+                        kunyomi = ideogram.kunyomi ?: "",
+                        qtd_tracos = ideogram.qtd_tracos ?: 0,
+                        frequencia = ideogram.frequencia ?: 0,
+                        exemplo1 = ideogram.exemplo1 ?: "",
+                        ex1_significado = ideogram.ex1_significado ?: "",
+                        exemplo2 = ideogram.exemplo2 ?: "",
+                        ex2_significado = ideogram.ex2_significado ?: "",
+                        exemplo3 = ideogram.exemplo3 ?: "",
+                        ex3_significado = ideogram.ex3_significado ?: "",
+                        exemplo4 = ideogram.exemplo4 ?: "",
+                        ex4_significado = ideogram.ex4_significado ?: ""
+                    )
+                    kanjis.add(kanji) // Adiciona o objeto Kanji à lista
+                    Log.d("KanjiList", "Kanji adicionado: ID = ${kanji.id}")
+                }
+                Log.d("KanjiList", "Número de Kanjis encontrados: ${kanjis.size}")
+                adapter.notifyDataSetChanged() // Notifica o adapter sobre a mudança de dados
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("FirebaseData", "Database error: ${databaseError.message}")
+            }
+        })
+    }
+
+    private fun filterKanjis() {
+        // Filtra a lista de kanjis reconhecidos
+        val filteredKanjis = kanjis.filter { kanji ->
+            kanji.id in kanjiList // Verifica se o ID do Kanji está na lista de Kanjis reconhecidos
+        }
+
+        // Atualiza o adapter com os Kanjis filtrados
+        adapter.updateList(filteredKanjis)
+    }
+
+    override fun onClick(kanji: Kanji) {
+        val intent = Intent(requireContext(), Kanji_InfoActivity::class.java)
+        intent.putExtra(KANJI_ID_EXTRA, kanji.id)
+        startActivity(intent)
     }
 }

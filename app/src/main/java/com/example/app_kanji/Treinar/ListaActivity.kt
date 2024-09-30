@@ -43,13 +43,11 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        // Definindo a cor do ícone de voltar
         val backIcon: Drawable? = toolbar.navigationIcon
         backIcon?.let {
-            DrawableCompat.setTint(it, Color.WHITE) // Altere para a cor desejada
+            DrawableCompat.setTint(it, Color.WHITE)
             toolbar.navigationIcon = it
         }
-
 
         categoriaSelecionada = intent.getStringExtra("categoria")
 
