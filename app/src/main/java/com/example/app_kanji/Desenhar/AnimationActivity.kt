@@ -1,14 +1,13 @@
 package com.example.app_kanji.Desenhar
-
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.os.Handler
-import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.PathParser
 import com.example.app_kanji.R
@@ -17,17 +16,21 @@ import org.xml.sax.InputSource
 import java.io.InputStream
 import javax.xml.parsers.DocumentBuilderFactory
 
-class AnimationActivity : AppCompatActivity() {
+class AnimationActivity : AppCompatActivity(), DrawingCompleteListener {
 
     private lateinit var svgImageView: ImageView
     private lateinit var backButton: ImageView
+    private lateinit var drawingView: AnimDrawingClass
     private val handler = Handler()
-    private val strokeDelay: Long = 500 // Tempo de atraso entre cada traço (em milissegundos)
     private var currentStrokeIndex = 0
     private lateinit var paths: List<Path>
     private lateinit var bitmap: Bitmap
     private lateinit var canvas: Canvas
-    private lateinit var paint: Paint
+    private lateinit var pathPaint: Paint
+    private lateinit var userPaint: Paint
+
+    private var svgWidth = 200f // Ajuste conforme necessário
+    private var svgHeight = 200f // Ajuste conforme necessário
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,21 +38,32 @@ class AnimationActivity : AppCompatActivity() {
 
         svgImageView = findViewById(R.id.svgImageView)
         backButton = findViewById(R.id.backButton)
+        drawingView = findViewById(R.id.drawingView)
+
+        // Define o listener para o desenho
+        drawingView.setDrawingCompleteListener(this)
 
         // Inicializa o bitmap e o canvas
-        bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
+        bitmap = Bitmap.createBitmap(svgWidth.toInt(), svgHeight.toInt(), Bitmap.Config.ARGB_8888)
         canvas = Canvas(bitmap)
         canvas.drawColor(Color.WHITE) // Cor de fundo
 
-        // Inicializa a pintura
-        paint = Paint().apply {
+        // Inicializa a pintura do caminho da animação
+        pathPaint = Paint().apply {
             style = Paint.Style.STROKE
-            strokeWidth = 3f // Largura do traço
-            color = Color.BLACK
+            strokeWidth = 8f // Largura do traço
+            color = Color.LTGRAY // Cor da animação
+        }
+
+        // Inicializa a pintura do caminho do usuário
+        userPaint = Paint().apply {
+            style = Paint.Style.STROKE
+            strokeWidth = 8f // Largura do traço
+            color = Color.BLACK // Cor do traço do usuário
         }
 
         // Carrega o SVG a partir do recurso raw
-        loadSvgFromResource(R.raw.u59b9)
+        loadSvgFromResource(R.raw.u5b66)
 
         // Configura o botão de voltar
         backButton.setOnClickListener {
@@ -57,27 +71,22 @@ class AnimationActivity : AppCompatActivity() {
         }
     }
 
-    // Função para carregar o SVG como XML a partir de um recurso
+    // Método da interface chamado quando o desenho é concluído
+    override fun onDrawingComplete() {
+        drawUserPath() // Chama o método para verificar o desenho do usuário
+    }
+
     private fun loadSvgFromResource(resourceId: Int) {
         try {
-            // Obtém o SVG a partir do recurso raw como um InputStream
             val inputStream: InputStream = resources.openRawResource(resourceId)
-
-            // Converte o SVG em um Document XML
             val svgDocument = parseSvgToDocument(inputStream)
-
-            // Extrai os caminhos do SVG
             paths = extractPathsFromSVG(svgDocument)
-
-            // Inicia a animação dos traços
-            animateStrokes()
-
+            animateStrokes() // Chama a animação para desenhar todos os traços juntos
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    // Função para converter o SVG em um Document XML
     private fun parseSvgToDocument(inputStream: InputStream): Document {
         val factory = DocumentBuilderFactory.newInstance()
         val builder = factory.newDocumentBuilder()
@@ -85,53 +94,34 @@ class AnimationActivity : AppCompatActivity() {
         return builder.parse(inputSource)
     }
 
-    // Extrai os caminhos do SVG
     private fun extractPathsFromSVG(svgDocument: Document): List<Path> {
         val pathList = mutableListOf<Path>()
         val pathElements = svgDocument.getElementsByTagName("path")
-
-        // Itera sobre os elementos path no SVG
         for (i in 0 until pathElements.length) {
             val pathElement = pathElements.item(i)
-            val pathData = pathElement.attributes.getNamedItem("d").nodeValue // Obtém o atributo 'd'
-            val path = PathParser.createPathFromPathData(pathData) // Converte para Path
+            val pathData = pathElement.attributes.getNamedItem("d").nodeValue
+            val path = PathParser.createPathFromPathData(pathData)
             pathList.add(path)
         }
-
         return pathList
     }
 
-    // Função para animar os traços do SVG
     private fun animateStrokes() {
-        currentStrokeIndex = 0
-        drawNextStroke()
+        currentStrokeIndex = 0 // Certifique-se de iniciar a partir do primeiro traço
+        drawNextStroke() // Inicia a animação dos traços
     }
 
     private fun drawNextStroke() {
         if (currentStrokeIndex < paths.size) {
             animatePath(currentStrokeIndex) {
-                val drawingView: DrawingView = findViewById(R.id.drawingView)
-                drawingView.reset() // Limpar qualquer desenho anterior
-                drawingView.visibility = View.VISIBLE // Tornar a view visível para o desenho
-
-                drawingView.setOnTouchListener { _, event ->
-                    if (event.action == MotionEvent.ACTION_UP) {
-                        // Aqui você pode validar o desenho do usuário
-                        // Se correto, chamar a próxima animação
-                        currentStrokeIndex++ // Aumentar o índice do traço atual
-                        drawNextStroke() // Chamar o próximo traço
-                        drawingView.visibility = View.GONE // Esconder a DrawingView
-                    }
-                    true
-                }
+                currentStrokeIndex++ // Move para o próximo traço
+                drawNextStroke() // Desenha o próximo traço
             }
         } else {
-            // Esconder a DrawingView após todos os traços serem desenhados
-            val drawingView: DrawingView = findViewById(R.id.drawingView)
+            // Esconder a DrawingView após todos os traços (opcional)
             drawingView.visibility = View.GONE
         }
     }
-
 
     private fun animatePath(index: Int, onComplete: () -> Unit) {
         val path = paths[index]
@@ -139,47 +129,98 @@ class AnimationActivity : AppCompatActivity() {
 
         // Cria um ValueAnimator para animar o traço
         val animator = ValueAnimator.ofFloat(0f, pathMeasure.length)
-        animator.duration = 500 // Duração da animação para cada traço
+        animator.duration = 1000 // Duração da animação para cada traço
         animator.addUpdateListener { animation ->
             val length = animation.animatedValue as Float
 
-            // Limpa o canvas apenas na primeira animação
-            if (currentStrokeIndex == 0 && index == 0) {
+            // Limpa o canvas apenas no primeiro traço, depois mantém
+            if (currentStrokeIndex == 0) {
                 canvas.drawColor(Color.WHITE) // Limpa o canvas apenas na primeira animação
             }
 
-            // Cria um novo path que representará o traço animado
+            // Desenha todos os traços até agora
+            for (i in 0 until currentStrokeIndex) {
+                val completedPath = paths[i]
+                val completedPathMeasure = PathMeasure(completedPath, false)
+                val animatedCompletedPath = Path()
+                completedPathMeasure.getSegment(0f, completedPathMeasure.length, animatedCompletedPath, true)
+                canvas.drawPath(animatedCompletedPath, pathPaint) // Desenha o caminho já animado
+            }
+
+            // Anima o traço atual
             val animatedPath = Path()
             pathMeasure.getSegment(0f, length, animatedPath, true)
+            canvas.drawPath(animatedPath, pathPaint) // Desenha o caminho da animação atual
 
-            // Desenha o path animado no canvas
-            canvas.drawPath(animatedPath, paint)
-
-            // Cria um PictureDrawable a partir do bitmap atualizado
+            // Atualiza a imagem do SVG
             val animatedDrawable = BitmapDrawable(resources, bitmap)
-
-            // Define o drawable animado no ImageView
             svgImageView.setImageDrawable(animatedDrawable)
         }
-
         animator.addListener(object : Animator.AnimatorListener {
-            override fun onAnimationStart(animation: Animator) {
-                // Lógica opcional para quando a animação começa
-            }
-
+            override fun onAnimationStart(animation: Animator) {}
             override fun onAnimationEnd(animation: Animator) {
-                onComplete() // Chama a função de conclusão ao final da animação
+                onComplete() // Chama o callback quando a animação termina
             }
-
-            override fun onAnimationCancel(animation: Animator) {
-                // Lógica opcional para quando a animação é cancelada
-            }
-
-            override fun onAnimationRepeat(animation: Animator) {
-                // Lógica opcional para quando a animação é repetida
-            }
+            override fun onAnimationCancel(animation: Animator) {}
+            override fun onAnimationRepeat(animation: Animator) {}
         })
-
         animator.start()
+    }
+
+    private fun drawUserPath() {
+        // Desenha o caminho do usuário em preto
+        val userPath = drawingView.getPath() // Obtém o caminho desenhado pelo usuário
+
+        // Aplica transformação de escala e posição, se necessário
+        val scaleX = svgWidth / drawingView.width
+        val scaleY = svgHeight / drawingView.height
+        val transformMatrix = Matrix().apply {
+            setScale(scaleX, scaleY)
+        }
+        val transformedUserPath = Path().apply {
+            addPath(userPath, transformMatrix)
+        }
+
+        // Desenha o caminho do usuário no canvas
+        canvas.drawPath(transformedUserPath, userPaint)
+
+        // Atualiza a imagem do SVG para refletir o desenho do usuário
+        val animatedDrawable = BitmapDrawable(resources, bitmap)
+        svgImageView.setImageDrawable(animatedDrawable)
+
+        // Verifica se o caminho do usuário é semelhante ao caminho atual
+        if (currentStrokeIndex < paths.size && isPathSimilar(transformedUserPath, paths[currentStrokeIndex])) {
+            currentStrokeIndex++ // Move para o próximo traço se forem semelhantes
+            drawNextStroke() // Inicia o próximo traço
+        } else {
+            // Opcional: mostrar uma mensagem ao usuário de que o traço não está correto
+            showFeedback("Desenho não correspondente. Tente novamente.")
+        }
+    }
+
+    private fun isPathSimilar(userPath: Path, kanjiPath: Path): Boolean {
+        val userPathMeasure = PathMeasure(userPath, false)
+        val kanjiPathMeasure = PathMeasure(kanjiPath, false)
+
+        val userLength = userPathMeasure.length
+        val kanjiLength = kanjiPathMeasure.length
+
+        // Verifica a similaridade de comprimento
+        if (Math.abs(userLength - kanjiLength) > 20) return false
+
+        // Para uma verificação mais rigorosa, você pode comparar a geometria dos caminhos
+        val userBounds = RectF()
+        userPath.computeBounds(userBounds, true)
+
+        val kanjiBounds = RectF()
+        kanjiPath.computeBounds(kanjiBounds, true)
+
+        // Checa se as bounding boxes são próximas
+        return userBounds.intersect(kanjiBounds)
+    }
+
+    private fun showFeedback(message: String) {
+        // Implemente uma lógica para exibir uma mensagem ao usuário
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

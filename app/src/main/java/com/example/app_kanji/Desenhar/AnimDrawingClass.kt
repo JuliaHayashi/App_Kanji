@@ -6,20 +6,31 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 
-class DrawingView @JvmOverloads constructor(
+// Defina uma interface para a comunicação
+interface DrawingCompleteListener {
+    fun onDrawingComplete() // Método a ser chamado quando o desenho for concluído
+}
+
+class AnimDrawingClass @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : View(context, attrs) {
 
     private val paint = Paint().apply {
-        color = Color.RED
+        color = Color.BLACK // Cor do pincel
         style = Paint.Style.STROKE
-        strokeWidth = 8f
+        strokeWidth = 12f // Ajuste a largura do traço, se necessário
         isAntiAlias = true
     }
-    private val path = Path()
+
+    private val path = Path() // Armazena o caminho desenhado pelo usuário
+    private var drawingCompleteListener: DrawingCompleteListener? = null // Referência para o listener
 
     init {
         setBackgroundColor(Color.TRANSPARENT) // Torna o fundo transparente
+    }
+
+    fun setDrawingCompleteListener(listener: DrawingCompleteListener) {
+        drawingCompleteListener = listener // Define o listener
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -33,19 +44,23 @@ class DrawingView @JvmOverloads constructor(
 
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                path.moveTo(x, y) // Move o caminho para a posição inicial
+                path.moveTo(x, y) // Move o caminho para a posição onde o usuário clicou
                 invalidate() // Redesenha a view
+                return true // Indica que o evento foi tratado
             }
             MotionEvent.ACTION_MOVE -> {
                 path.lineTo(x, y) // Adiciona uma linha ao caminho
-                invalidate()
+                invalidate() // Redesenha a view
             }
             MotionEvent.ACTION_UP -> {
-                // Aqui você pode adicionar a lógica de validação se necessário
-                // Para continuar, pode ser interessante chamar um callback ou método
+                drawingCompleteListener?.onDrawingComplete() // Chama o método do listener ao soltar o toque
             }
         }
-        return true
+        return true // Indica que o evento foi tratado
+    }
+
+    fun getPath(): Path {
+        return path // Retorna o caminho desenhado pelo usuário
     }
 
     fun reset() {
