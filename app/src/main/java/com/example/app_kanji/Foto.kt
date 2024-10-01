@@ -35,6 +35,14 @@ import com.google.firebase.database.ValueEventListener
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
+import org.tensorflow.lite.DataType
+import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.support.common.FileUtil
+import org.tensorflow.lite.support.image.TensorImage
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
 
 class Foto : Fragment(), KanjiClickListener {
 
@@ -46,9 +54,9 @@ class Foto : Fragment(), KanjiClickListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: CardAdapter
     private val kanjis = mutableListOf<Kanji>()
-
-    // Lista para armazenar os Kanjis reconhecidos
-    private val kanjiList = mutableListOf<String>()
+    private val kanjiList = mutableListOf<String>() // Lista para armazenar os Kanjis reconhecidos
+    private var interpreter: Interpreter? = null
+    private val labels = mutableListOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,6 +64,7 @@ class Foto : Fragment(), KanjiClickListener {
     ): View {
         binding = FragmentFotoBinding.inflate(inflater, container, false)
         setupActivityResultLaunchers()
+        setupInterpreter()
 
         // Botão para capturar uma foto pela câmera
         binding.btnTirarFoto.setOnClickListener {
@@ -76,18 +85,13 @@ class Foto : Fragment(), KanjiClickListener {
 
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
-
         adapter = CardAdapter(kanjis, this)
-
         recyclerView.adapter = adapter
-
-        // Não chama `populateKanjis()` aqui para evitar a exibição inicial
 
         return binding.root
     }
 
     private fun setupActivityResultLaunchers() {
-        // Solicitação de permissão para usar a câmera
         requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val granted = permissions.entries.all { it.value }
             if (granted) {
@@ -98,7 +102,6 @@ class Foto : Fragment(), KanjiClickListener {
             }
         }
 
-        // Captura de imagem pela câmera
         takePictureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == android.app.Activity.RESULT_OK) {
                 val imageBitmap = result.data?.extras?.get("data") as Bitmap
@@ -108,7 +111,6 @@ class Foto : Fragment(), KanjiClickListener {
             }
         }
 
-        // Seleção de imagem da galeria
         galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
                 Glide.with(this)
@@ -137,25 +139,19 @@ class Foto : Fragment(), KanjiClickListener {
     // Função para processar a imagem e realizar OCR japonês
     private fun processImageForOCR(bitmap: Bitmap) {
         try {
-            // Inicializa o databaseReference aqui antes de chamar populateKanjis()
             databaseReference = FirebaseDatabase.getInstance().reference.child("Ideogramas")
 
-            // Criação do objeto InputImage para OCR
             val image = InputImage.fromBitmap(bitmap, 0)
             val recognizer = TextRecognition.getClient(JapaneseTextRecognizerOptions.Builder().build())
 
             recognizer.process(image)
                 .addOnSuccessListener { visionText ->
-                    // Limpar a lista de Kanjis antes de adicionar os novos
                     kanjiList.clear()
 
-                    // Verifica se algum texto foi reconhecido
                     if (visionText.text.isNotEmpty()) {
-                        // Itera pelos blocos de texto e extrai Kanjis
                         for (block in visionText.textBlocks) {
                             for (line in block.lines) {
                                 for (element in line.elements) {
-                                    // Adiciona cada Kanji encontrado à lista
                                     element.text.forEach { char ->
                                         if (char.isKanji()) {
                                             kanjiList.add(char.toString())
@@ -165,47 +161,39 @@ class Foto : Fragment(), KanjiClickListener {
                             }
                         }
 
-                        // Atualiza o TextView com a lista de Kanjis encontrados
                         if (kanjiList.isNotEmpty()) {
                             binding.resultTextView.text = "Kanjis encontrados: ${kanjiList.joinToString(", ")}"
-                            // Popula os Kanjis após o OCR ser bem-sucedido
                             populateKanjis()
                         } else {
                             binding.resultTextView.text = "Nenhum Kanji encontrado"
-                            adapter.updateList(emptyList()) // Limpa a lista do adapter
+                            adapter.updateList(emptyList())
                         }
                     } else {
                         binding.resultTextView.text = "Nenhum texto reconhecido"
-                        adapter.updateList(emptyList()) // Limpa a lista do adapter
+                        adapter.updateList(emptyList())
+                        processImageWithModel(bitmap) // Se o OCR falhar, tenta o modelo .tflite
                     }
                 }
                 .addOnFailureListener { e ->
                     Log.e("FotoFragment", "Erro ao processar OCR: ${e.message}")
                     binding.resultTextView.text = "Erro ao processar a imagem"
-                    adapter.updateList(emptyList()) // Limpa a lista do adapter
+                    adapter.updateList(emptyList())
+                    processImageWithModel(bitmap) // Se o OCR falhar, tenta o modelo .tflite
                 }
         } catch (e: Exception) {
             Log.e("FotoFragment", "Erro ao preparar imagem para OCR: ${e.message}")
         }
     }
-    
-
-    // Função de extensão para verificar se um caractere é um Kanji
-    private fun Char.isKanji(): Boolean {
-        return this in '\u4E00'..'\u9FAF'
-    }
 
     private fun populateKanjis() {
-        kanjis.clear() // Limpa a lista para evitar duplicatas
+        kanjis.clear()
         databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (ideogramSnapshot in dataSnapshot.children) {
                     val kanjiId = ideogramSnapshot.key ?: continue
                     val ideogram = ideogramSnapshot.getValue(Ideogramas::class.java) ?: continue
 
-                    // Adiciona o Kanji apenas se ele for reconhecido pelo OCR
                     if (kanjiId in kanjiList) {
-                        // Cria um objeto Kanji e o adiciona à lista
                         val kanji = Kanji(
                             id = kanjiId,
                             imageUrl = ideogram.imagem ?: "",
@@ -223,18 +211,63 @@ class Foto : Fragment(), KanjiClickListener {
                             exemplo4 = ideogram.exemplo4 ?: "",
                             ex4_significado = ideogram.ex4_significado ?: ""
                         )
-                        kanjis.add(kanji) // Adiciona o objeto Kanji à lista
+                        kanjis.add(kanji)
                         Log.d("KanjiList", "Kanji adicionado: ID = ${kanji.id}")
                     }
                 }
-                Log.d("KanjiList", "Número de Kanjis encontrados: ${kanjis.size}")
-                adapter.notifyDataSetChanged() // Notifica o adapter sobre a mudança de dados
+                adapter.notifyDataSetChanged()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
                 Log.e("FirebaseData", "Database error: ${databaseError.message}")
             }
         })
+    }
+
+    // Função para processar a imagem com o modelo .tflite se o OCR falhar
+    private fun processImageWithModel(bitmap: Bitmap) {
+        try {
+            val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 640, 640, true)
+            val tensorImage = TensorImage(DataType.FLOAT32)
+            tensorImage.load(resizedBitmap)
+
+            val inputBuffer = TensorBuffer.createFixedSize(intArrayOf(1, 640, 640, 3), DataType.FLOAT32)
+            inputBuffer.loadBuffer(tensorImage.buffer)
+
+            val outputBuffer = TensorBuffer.createFixedSize(intArrayOf(1, labels.size), DataType.FLOAT32)
+            interpreter?.run(inputBuffer.buffer, outputBuffer.buffer)
+
+            val outputArray = outputBuffer.floatArray
+            val maxIndex = outputArray.indices.maxByOrNull { outputArray[it] } ?: -1
+            val identifiedLabel = if (maxIndex != -1) labels[maxIndex] else "Nenhuma identificação"
+            binding.resultTextView.text = "IA Resultado: $identifiedLabel"
+        } catch (e: Exception) {
+            Log.e("FotoFragment", "Erro ao processar a imagem com o modelo: ${e.message}")
+        }
+    }
+
+    private fun setupInterpreter() {
+        try {
+            val model = FileUtil.loadMappedFile(requireContext(), "best (1)_float32.tflite")
+            interpreter = Interpreter(model)
+
+            val inputStream = requireContext().assets.open("labels.txt")
+            val reader = BufferedReader(InputStreamReader(inputStream))
+            var line: String? = reader.readLine()
+            while (line != null) {
+                labels.add(line)
+                line = reader.readLine()
+            }
+            reader.close()
+
+            Log.d("FotoFragment", "Labels carregadas: $labels")
+        } catch (e: IOException) {
+            Log.e("FotoFragment", "Erro ao configurar o interpreter: ${e.message}")
+        }
+    }
+
+    private fun Char.isKanji(): Boolean {
+        return this in '\u4E00'..'\u9FAF'
     }
 
     override fun onClick(kanji: Kanji) {
