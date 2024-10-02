@@ -58,6 +58,7 @@ class Kanji_InfoActivity : AppCompatActivity() {
             val kanji = kanjiFromID(kanjiID)
             if (kanji != null) {
                 intent.putExtra("KANJI_IMAGE_URL", kanji.imageUrl)
+                intent.putExtra("KANJI_ID", kanji.id)
             }
             startActivity(intent)
         }
