@@ -47,7 +47,6 @@ class Foto : Fragment(), KanjiClickListener {
     private lateinit var adapter: CardAdapter
     private val kanjis = mutableListOf<Kanji>()
 
-    // Lista para armazenar os Kanjis reconhecidos
     private val kanjiList = mutableListOf<String>()
 
     override fun onCreateView(
@@ -57,7 +56,6 @@ class Foto : Fragment(), KanjiClickListener {
         binding = FragmentFotoBinding.inflate(inflater, container, false)
         setupActivityResultLaunchers()
 
-        // Botão para capturar uma foto pela câmera
         binding.btnTirarFoto.setOnClickListener {
             if (hasCameraPermission()) {
                 val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -69,7 +67,6 @@ class Foto : Fragment(), KanjiClickListener {
             }
         }
 
-        // Botão para selecionar uma imagem da galeria
         binding.btnFoto.setOnClickListener {
             galleryLauncher.launch("image/*")
         }
@@ -82,7 +79,7 @@ class Foto : Fragment(), KanjiClickListener {
 
         recyclerView.adapter = adapter
 
-        populateKanjis() // Carregar os Kanjis do Firebase
+        populateKanjis()
 
         return binding.root
     }
@@ -199,7 +196,6 @@ class Foto : Fragment(), KanjiClickListener {
                     val kanjiId = ideogramSnapshot.key ?: continue
                     val ideogram = ideogramSnapshot.getValue(Ideogramas::class.java) ?: continue
 
-                    // Cria um objeto Kanji e o adiciona à lista
                     val kanji = Kanji(
                         id = kanjiId,
                         imageUrl = ideogram.imagem ?: "",
@@ -231,12 +227,10 @@ class Foto : Fragment(), KanjiClickListener {
     }
 
     private fun filterKanjis() {
-        // Filtra a lista de kanjis reconhecidos
         val filteredKanjis = kanjis.filter { kanji ->
-            kanji.id in kanjiList // Verifica se o ID do Kanji está na lista de Kanjis reconhecidos
+            kanji.id in kanjiList
         }
 
-        // Atualiza o adapter com os Kanjis filtrados
         adapter.updateList(filteredKanjis)
     }
 
