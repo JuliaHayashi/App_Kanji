@@ -5,12 +5,12 @@
 
     <group
         android:checkableBehavior="single">
-
+        <!--
         <item
             android:id="@+id/configuracoes"
             android:icon="@drawable/baseline_settings_24"
             android:title="Configurações"/>
-
+        -->
         <item
             android:id="@+id/email"
             android:icon="@drawable/baseline_email_24"

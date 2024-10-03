@@ -54,21 +54,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     binding.bottomNavigationView.selectedItemId = R.id.treinar // Seleciona o item "Treinar"
                 }
                 else -> {
-                    replaceFragment(Home())
-                    binding.bottomNavigationView.selectedItemId = R.id.home // Seleciona o item "Home"
+                   // replaceFragment(Home())
+                    //binding.bottomNavigationView.selectedItemId = R.id.home // Seleciona o item "Home"
+                    replaceFragment(Foto())
+                    binding.bottomNavigationView.selectedItemId = R.id.foto // Seleciona o item "Home"
                 }
             }
         } ?: run {
-            replaceFragment(Home()) // Caso nenhum extra esteja presente
-            binding.bottomNavigationView.selectedItemId = R.id.home // Seleciona o item "Home" como padrão
+            //replaceFragment(Home()) // Caso nenhum extra esteja presente
+            //binding.bottomNavigationView.selectedItemId = R.id.home // Seleciona o item "Home" como padrão
+            replaceFragment(Foto())
+            binding.bottomNavigationView.selectedItemId = R.id.foto
         }
 
         binding.bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
-                R.id.home -> {
-                    replaceFragment(Home())
-                    true
-                }
+                //R.id.home -> {
+               //     replaceFragment(Home())
+                //    true
+                //}
                 R.id.foto -> {
                     replaceFragment(Foto())
                     true
@@ -103,7 +107,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.configuracoes -> replaceFragment(Configuracoes())
+            //R.id.configuracoes -> replaceFragment(Configuracoes())
             R.id.email -> enviarEmail()
             R.id.info -> replaceFragment(Info())
             R.id.login -> logout()

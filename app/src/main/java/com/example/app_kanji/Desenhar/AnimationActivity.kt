@@ -63,14 +63,20 @@ class AnimationActivity : AppCompatActivity(), DrawingCompleteListener {
             color = Color.BLACK // Cor do traço do usuário
         }
 
-        // Carrega o SVG a partir do recurso raw
-        loadSvgFromResource(R.raw.u5b66)
+        // Recebe o ID do recurso SVG do Intent
+        val resourceId = intent.getIntExtra("KANJI_SVG_RESOURCE_ID", 0)
+        if (resourceId != 0) {
+            loadSvgFromResource(resourceId)
+        } else {
+            Toast.makeText(this, "Erro ao carregar o kanji", Toast.LENGTH_SHORT).show()
+        }
 
         // Configura o botão de voltar
         backButton.setOnClickListener {
             finish()
         }
     }
+
 
     // Método da interface chamado quando o desenho é concluído
     override fun onDrawingComplete() {

@@ -17,6 +17,7 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="82dp"
+        android:src="@drawable/icone_app_kanji"
         android:layout_height="90dp"/>
 
     <TextView

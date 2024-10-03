@@ -58,12 +58,22 @@ class DesenhoActivity : AppCompatActivity() {
             desenhoView.clear() // Método que deve ser implementado em `DesenhoClass` para limpar o desenho
         }
 
+
+
         val animationButton = findViewById<ImageView>(R.id.animationButton)
         animationButton.setOnClickListener {
-            val intent = Intent(this, AnimationActivity::class.java)
-            intent.putExtra("KANJI_SVG_RESOURCE_ID", R.raw.u4e00) // Substitua 'seu_svg' pelo nome do seu arquivo SVG
-            startActivity(intent)
+            val kanjiHexCode = expectedKanji.codePointAt(0).toString(16)  // Converte o kanji para seu código hexadecimal
+            val resourceId = resources.getIdentifier("u$kanjiHexCode", "raw", packageName)  // Encontra o ID do recurso SVG correspondente
+
+            if (resourceId != 0) {
+                val intent = Intent(this, AnimationActivity::class.java)
+                intent.putExtra("KANJI_SVG_RESOURCE_ID", resourceId)
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "Kanji SVG não encontrado", Toast.LENGTH_SHORT).show()
+            }
         }
+
 
         // Recebe a URL da imagem do kanji da atividade anterior
         val kanjiImageUrl = intent.getStringExtra("KANJI_IMAGE_URL")
