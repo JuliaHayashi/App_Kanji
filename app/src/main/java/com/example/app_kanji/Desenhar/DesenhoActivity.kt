@@ -74,7 +74,6 @@ class DesenhoActivity : AppCompatActivity() {
             }
         }
 
-
         // Recebe a URL da imagem do kanji da atividade anterior
         val kanjiImageUrl = intent.getStringExtra("KANJI_IMAGE_URL")
         if (kanjiImageUrl != null) {

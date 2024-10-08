@@ -77,7 +77,6 @@ class AnimationActivity : AppCompatActivity(), DrawingCompleteListener {
         }
     }
 
-
     // Método da interface chamado quando o desenho é concluído
     override fun onDrawingComplete() {
         drawUserPath() // Chama o método para verificar o desenho do usuário
