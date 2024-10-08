@@ -77,7 +77,7 @@ class Foto : Fragment(), KanjiClickListener {
         // Inicializar RecyclerView com uma lista vazia
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
-        adapter = CardAdapter(mutableListOf(), this)  
+        adapter = CardAdapter(mutableListOf(), this)
         recyclerView.adapter = adapter
 
         // Os kanjis não são carregados automaticamente aqui!

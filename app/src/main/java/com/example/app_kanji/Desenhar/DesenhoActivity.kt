@@ -98,11 +98,7 @@ class DesenhoActivity : AppCompatActivity() {
         }
 
         // Botão para verificar o kanji desenhado
-        val checkKanjiButton: Button = findViewById(R.id.checkKanjiButton)
-        checkKanjiButton.setOnClickListener {
-            checkKanji()
         }
-    }
 
     // Função para carregar o modelo .tflite
     private fun loadModelFile(): ByteBuffer {
