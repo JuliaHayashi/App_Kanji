@@ -74,15 +74,14 @@ class Foto : Fragment(), KanjiClickListener {
             galleryLauncher.launch("image/*")
         }
 
-        databaseReference = FirebaseDatabase.getInstance().reference.child("Ideogramas")
+        // Inicializar RecyclerView com uma lista vazia
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
-
-        adapter = CardAdapter(kanjis, this)
-
+        adapter = CardAdapter(mutableListOf(), this)  
         recyclerView.adapter = adapter
 
-        populateKanjis() // Carregar os Kanjis do Firebase
+        // Os kanjis não são carregados automaticamente aqui!
+        // populateKanjis() não é chamado no onCreateView
 
         return binding.root
     }
@@ -103,7 +102,7 @@ class Foto : Fragment(), KanjiClickListener {
         takePictureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == android.app.Activity.RESULT_OK) {
                 val imageBitmap = result.data?.extras?.get("data") as Bitmap
-                processImageForOCR(imageBitmap)
+                processImageForOCR(imageBitmap)  // Processa a imagem e carrega os kanjis
             } else {
                 Log.e("FotoFragment", "Falha ao capturar a imagem")
             }
@@ -117,7 +116,7 @@ class Foto : Fragment(), KanjiClickListener {
                     .load(it)
                     .into(object : CustomTarget<Bitmap>() {
                         override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                            processImageForOCR(resource)
+                            processImageForOCR(resource)  // Processa a imagem e carrega os kanjis
                         }
 
                         override fun onLoadCleared(placeholder: Drawable?) {
@@ -163,10 +162,10 @@ class Foto : Fragment(), KanjiClickListener {
                             }
                         }
 
-                        // Atualiza o TextView com a lista de Kanjis encontrados
+                        // Se Kanjis forem encontrados, agora popula a lista
                         if (kanjiList.isNotEmpty()) {
                             binding.resultTextView.text = "Kanjis encontrados: ${kanjiList.joinToString(", ")}"
-                            filterKanjis() // Chama a função de filtragem
+                            populateKanjis()  // Agora os kanjis são carregados e filtrados
                         } else {
                             binding.resultTextView.text = "Nenhum Kanji encontrado"
                             adapter.updateList(emptyList()) // Limpa a lista do adapter
@@ -191,8 +190,10 @@ class Foto : Fragment(), KanjiClickListener {
         return this in '\u4E00'..'\u9FAF'
     }
 
+    // Agora, a função populateKanjis só é chamada após o OCR ou outro evento
     private fun populateKanjis() {
         kanjis.clear() // Limpa a lista para evitar duplicatas
+        databaseReference = FirebaseDatabase.getInstance().reference.child("Ideogramas")
         databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (ideogramSnapshot in dataSnapshot.children) {
@@ -218,10 +219,9 @@ class Foto : Fragment(), KanjiClickListener {
                         ex4_significado = ideogram.ex4_significado ?: ""
                     )
                     kanjis.add(kanji) // Adiciona o objeto Kanji à lista
-                    Log.d("KanjiList", "Kanji adicionado: ID = ${kanji.id}")
                 }
                 Log.d("KanjiList", "Número de Kanjis encontrados: ${kanjis.size}")
-                adapter.notifyDataSetChanged() // Notifica o adapter sobre a mudança de dados
+                filterKanjis() // Aqui chamamos a filtragem após o OCR
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
