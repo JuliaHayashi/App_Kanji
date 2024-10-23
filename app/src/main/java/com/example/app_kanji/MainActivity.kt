@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun enviarEmail() {
         val emailIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_EMAIL, arrayOf("kanji.app@gmail.com"))
+            putExtra(Intent.EXTRA_EMAIL, arrayOf("shashin.kanji.app@gmail.com"))
             putExtra(Intent.EXTRA_SUBJECT, "")
             putExtra(Intent.EXTRA_TEXT, "")
             setPackage("com.google.android.gm")

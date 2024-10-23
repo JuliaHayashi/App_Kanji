@@ -143,7 +143,6 @@ class Foto : Fragment(), KanjiClickListener {
 
             recognizer.process(image)
                 .addOnSuccessListener { visionText ->
-                    // Limpar a lista de Kanjis antes de adicionar os novos
                     kanjiList.clear()
 
                     // Verifica se algum texto foi reconhecido

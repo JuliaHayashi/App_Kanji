@@ -116,7 +116,7 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
 
     private fun goToAddKanjiActivity() {
         val intent = Intent(this, AddKanjisActivity::class.java)
-        intent.putExtra("categoria", categoriaSelecionada) // Passa a categoria selecionada
+        intent.putExtra("categoria", categoriaSelecionada)
         startActivity(intent)
     }
 
@@ -129,12 +129,38 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
         builder.setPositiveButton("Renomear") { dialog, _ ->
             val newCategoryName = input.text.toString().trim()
             if (newCategoryName.isNotEmpty()) {
-                renameCategory(categoriaSelecionada!!, newCategoryName)
+                checkIfCategoryExists(newCategoryName) { exists ->
+                    if (exists) {
+                        showErrorDialog("Esta categoria já existe. Escolha um nome diferente.")
+                    } else {
+                        renameCategory(categoriaSelecionada!!, newCategoryName)
+                    }
+                }
             }
             dialog.dismiss()
         }
 
         builder.setNegativeButton("Cancelar") { dialog, _ -> dialog.cancel() }
+        builder.show()
+    }
+    private fun checkIfCategoryExists(categoryName: String, callback: (Boolean) -> Unit) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val userCategoryRef = databaseReference.child("Categorias").child("DosUsuarios").child(userId)
+
+        userCategoryRef.get().addOnSuccessListener { snapshot ->
+            val exists = snapshot.hasChild(categoryName)
+            callback(exists)
+        }.addOnFailureListener { exception ->
+            Log.e("ListaActivity", "Erro ao verificar a categoria: ${exception.message}")
+            callback(false) // Se houver um erro, assume que não existe
+        }
+    }
+
+    private fun showErrorDialog(message: String) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Erro")
+        builder.setMessage(message)
+        builder.setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
         builder.show()
     }
 
@@ -150,6 +176,12 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
                         userCategoryRef.child(oldName).removeValue().addOnCompleteListener { deleteTask ->
                             if (deleteTask.isSuccessful) {
                                 Log.d("ListaActivity", "Categoria renomeada de $oldName para $newName")
+
+                                // Redireciona para a MainActivity com o fragmento "Treinar"
+                                val intent = Intent(this@ListaActivity, MainActivity::class.java)
+                                intent.putExtra("fragment", "treinar") // Passa o nome do fragmento
+                                startActivity(intent)
+                                finish() // Finaliza a ListaActivity
                             } else {
                                 Log.e("ListaActivity", "Erro ao remover a categoria antiga: ${deleteTask.exception?.message}")
                             }
@@ -165,6 +197,7 @@ class ListaActivity : AppCompatActivity(), KanjiClickListener {
             Log.e("ListaActivity", "Erro ao acessar a categoria: ${exception.message}")
         }
     }
+
 
     private fun showDeleteCategoryDialog() {
         val builder = AlertDialog.Builder(this)

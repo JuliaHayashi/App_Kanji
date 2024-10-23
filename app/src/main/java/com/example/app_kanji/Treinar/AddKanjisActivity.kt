@@ -1,12 +1,16 @@
 package com.example.app_kanji.Treinar
 
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.app_kanji.Pesquisar.CardAdapter
@@ -51,6 +55,18 @@ class AddKanjisActivity : AppCompatActivity(), KanjiClickListener {
         // Usar GridLayoutManager com 3 colunas
         kanjiRecyclerView.layoutManager = GridLayoutManager(this, 3)
         kanjiRecyclerView.adapter = adapter
+
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        val backIcon: Drawable? = toolbar.navigationIcon
+        backIcon?.let {
+            DrawableCompat.setTint(it, Color.WHITE)
+            toolbar.navigationIcon = it
+        }
+        toolbar.setNavigationOnClickListener {
+            onBackPressed()
+        }
 
         saveButton.setOnClickListener {
             val kanji = kanjiInput.text.toString().trim() // Remove espaços em branco
