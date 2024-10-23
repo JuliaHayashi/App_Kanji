@@ -17,18 +17,15 @@ import org.xml.sax.InputSource
 import java.io.InputStream
 import javax.xml.parsers.DocumentBuilderFactory
 
-class AnimationActivity : AppCompatActivity(), DrawingCompleteListener {
+class AnimationActivity : AppCompatActivity() {
 
     private lateinit var svgImageView: ImageView
     private lateinit var backButton: ImageView
-    private lateinit var drawingView: AnimDrawingClass
-    private val handler = Handler()
-    private var currentStrokeIndex = 0
-    private lateinit var paths: List<Path>
     private lateinit var bitmap: Bitmap
     private lateinit var canvas: Canvas
     private lateinit var pathPaint: Paint
-    private lateinit var userPaint: Paint
+    private var currentStrokeIndex = 0
+    private lateinit var paths: List<Path>
 
     private var svgWidth = 200f // Ajuste conforme necessário
     private var svgHeight = 200f // Ajuste conforme necessário
@@ -39,10 +36,6 @@ class AnimationActivity : AppCompatActivity(), DrawingCompleteListener {
 
         svgImageView = findViewById(R.id.svgImageView)
         backButton = findViewById(R.id.backButton)
-        drawingView = findViewById(R.id.drawingView)
-
-        // Define o listener para o desenho
-        drawingView.setDrawingCompleteListener(this)
 
         // Inicializa o bitmap e o canvas
         bitmap = Bitmap.createBitmap(svgWidth.toInt(), svgHeight.toInt(), Bitmap.Config.ARGB_8888)
@@ -54,13 +47,6 @@ class AnimationActivity : AppCompatActivity(), DrawingCompleteListener {
             style = Paint.Style.STROKE
             strokeWidth = 8f // Largura do traço
             color = Color.LTGRAY // Cor da animação
-        }
-
-        // Inicializa a pintura do caminho do usuário
-        userPaint = Paint().apply {
-            style = Paint.Style.STROKE
-            strokeWidth = 8f // Largura do traço
-            color = Color.BLACK // Cor do traço do usuário
         }
 
         // Recebe o ID do recurso SVG do Intent
@@ -75,11 +61,6 @@ class AnimationActivity : AppCompatActivity(), DrawingCompleteListener {
         backButton.setOnClickListener {
             finish()
         }
-    }
-
-    // Método da interface chamado quando o desenho é concluído
-    override fun onDrawingComplete() {
-        drawUserPath() // Chama o método para verificar o desenho do usuário
     }
 
     private fun loadSvgFromResource(resourceId: Int) {
@@ -123,9 +104,6 @@ class AnimationActivity : AppCompatActivity(), DrawingCompleteListener {
                 currentStrokeIndex++ // Move para o próximo traço
                 drawNextStroke() // Desenha o próximo traço
             }
-        } else {
-            // Esconder a DrawingView após todos os traços (opcional)
-            drawingView.visibility = View.GONE
         }
     }
 
@@ -138,19 +116,9 @@ class AnimationActivity : AppCompatActivity(), DrawingCompleteListener {
         animator.duration = 1000 // Duração da animação para cada traço
         animator.addUpdateListener { animation ->
             val length = animation.animatedValue as Float
-
             // Limpa o canvas apenas no primeiro traço, depois mantém
             if (currentStrokeIndex == 0) {
                 canvas.drawColor(Color.WHITE) // Limpa o canvas apenas na primeira animação
-            }
-
-            // Desenha todos os traços até agora
-            for (i in 0 until currentStrokeIndex) {
-                val completedPath = paths[i]
-                val completedPathMeasure = PathMeasure(completedPath, false)
-                val animatedCompletedPath = Path()
-                completedPathMeasure.getSegment(0f, completedPathMeasure.length, animatedCompletedPath, true)
-                canvas.drawPath(animatedCompletedPath, pathPaint) // Desenha o caminho já animado
             }
 
             // Anima o traço atual
@@ -171,62 +139,5 @@ class AnimationActivity : AppCompatActivity(), DrawingCompleteListener {
             override fun onAnimationRepeat(animation: Animator) {}
         })
         animator.start()
-    }
-
-    private fun drawUserPath() {
-        // Desenha o caminho do usuário em preto
-        val userPath = drawingView.getPath() // Obtém o caminho desenhado pelo usuário
-
-        // Aplica transformação de escala e posição, se necessário
-        val scaleX = svgWidth / drawingView.width
-        val scaleY = svgHeight / drawingView.height
-        val transformMatrix = Matrix().apply {
-            setScale(scaleX, scaleY)
-        }
-        val transformedUserPath = Path().apply {
-            addPath(userPath, transformMatrix)
-        }
-
-        // Desenha o caminho do usuário no canvas
-        canvas.drawPath(transformedUserPath, userPaint)
-
-        // Atualiza a imagem do SVG para refletir o desenho do usuário
-        val animatedDrawable = BitmapDrawable(resources, bitmap)
-        svgImageView.setImageDrawable(animatedDrawable)
-
-        // Verifica se o caminho do usuário é semelhante ao caminho atual
-        if (currentStrokeIndex < paths.size && isPathSimilar(transformedUserPath, paths[currentStrokeIndex])) {
-            currentStrokeIndex++ // Move para o próximo traço se forem semelhantes
-            drawNextStroke() // Inicia o próximo traço
-        } else {
-            // Opcional: mostrar uma mensagem ao usuário de que o traço não está correto
-            showFeedback("Desenho não correspondente. Tente novamente.")
-        }
-    }
-
-    private fun isPathSimilar(userPath: Path, kanjiPath: Path): Boolean {
-        val userPathMeasure = PathMeasure(userPath, false)
-        val kanjiPathMeasure = PathMeasure(kanjiPath, false)
-
-        val userLength = userPathMeasure.length
-        val kanjiLength = kanjiPathMeasure.length
-
-        // Verifica a similaridade de comprimento
-        if (Math.abs(userLength - kanjiLength) > 20) return false
-
-        // Para uma verificação mais rigorosa, você pode comparar a geometria dos caminhos
-        val userBounds = RectF()
-        userPath.computeBounds(userBounds, true)
-
-        val kanjiBounds = RectF()
-        kanjiPath.computeBounds(kanjiBounds, true)
-
-        // Checa se as bounding boxes são próximas
-        return userBounds.intersect(kanjiBounds)
-    }
-
-    private fun showFeedback(message: String) {
-        // Implemente uma lógica para exibir uma mensagem ao usuário
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

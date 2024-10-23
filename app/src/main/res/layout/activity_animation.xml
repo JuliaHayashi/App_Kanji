@@ -28,7 +28,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:tint="@android:color/white" />
-
+    <!--
     <com.example.app_kanji.Desenhar.AnimDrawingClass
         android:id="@+id/drawingView"
         android:layout_width="330dp"
@@ -39,5 +39,5 @@
         android:layout_marginTop="0dp"
         android:background="@android:color/transparent"
         android:alpha="0.8"/>
-
+        -->
 </androidx.constraintlayout.widget.ConstraintLayout>
